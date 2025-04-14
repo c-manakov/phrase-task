@@ -17,6 +17,7 @@ defmodule PhraseTaskWeb.Router do
   scope "/", PhraseTaskWeb do
     pipe_through :browser
 
+    # instead of loading a controller I want to have a liveview here AI!
     get "/", PageController, :home
   end
 
