@@ -87,63 +87,75 @@ defmodule PhraseTaskWeb.HomeLive do
   
   @impl true
   def render(assigns) do
-    # let's add some styling to make this pretty AI!
     ~H"""
-    <div class="container">
-      <h1>Timezone Converter</h1>
+    <div class="container mx-auto px-4 py-8 max-w-3xl">
+      <h1 class="text-4xl font-bold mb-12">Timezone Converter</h1>
       
-      <div class="time-input-section">
-        <h2>Enter time</h2>
+      <div class="mb-16">
+        <h2 class="text-2xl font-semibold mb-4">Enter time</h2>
         <input 
           type="text" 
           value={@input_time} 
           phx-keyup="update_time"
           phx-value-value={@input_time}
+          class="w-full border-2 border-gray-300 rounded-md p-4 text-xl mb-2 focus:border-blue-500 focus:outline-none"
         />
         <div>
-          <a href="#" phx-click="use_current_time">Use current time</a>
+          <a href="#" phx-click="use_current_time" class="text-blue-600 hover:underline">Use current time</a>
         </div>
       </div>
       
-      <div class="timezones-section">
-        <h2>Your timezones</h2>
+      <div class="mb-16">
+        <h2 class="text-2xl font-semibold mb-6">Your timezones</h2>
         
-        <table>
-          <thead>
-            <tr>
-              <th>City</th>
-              <th>Time</th>
-              <th>TZ</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <%= for {city, index} <- Enum.with_index(@cities) do %>
-              <tr>
-                <td><%= city.name %></td>
-                <td><%= convert_time(@current_time, city.timezone) %></td>
-                <td><%= get_timezone_abbreviation(city.timezone) %></td>
-                <td>
-                  <button phx-click="remove_city" phx-value-index={index}>x</button>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-        
-        <div class="add-city-section">
-          <div>
-            <label for="city-name">City name</label>
-            <input 
-              type="text" 
-              id="city-name"
-              value={@new_city} 
-              phx-keyup="update_new_city"
-              phx-value-value={@new_city}
-            />
+        <div class="mb-8">
+          <div class="grid grid-cols-12 font-semibold mb-2">
+            <div class="col-span-4">City</div>
+            <div class="col-span-4">Time</div>
+            <div class="col-span-3">TZ</div>
+            <div class="col-span-1"></div>
           </div>
           
-          <button phx-click="add_city" phx-value-city={@new_city}>ADD</button>
+          <%= for {city, index} <- Enum.with_index(@cities) do %>
+            <div class="grid grid-cols-12 py-4 border-b border-gray-200">
+              <div class="col-span-4"><%= city.name %></div>
+              <div class="col-span-4"><%= convert_time(@current_time, city.timezone) %></div>
+              <div class="col-span-3"><%= get_timezone_abbreviation(city.timezone) %></div>
+              <div class="col-span-1 text-right">
+                <button 
+                  phx-click="remove_city" 
+                  phx-value-index={index}
+                  class="bg-red-200 text-red-800 rounded-md px-2 py-1 hover:bg-red-300"
+                >
+                  x
+                </button>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        
+        <div class="mt-8">
+          <div class="flex items-end gap-4">
+            <div class="flex-1">
+              <label for="city-name" class="block mb-2">City name</label>
+              <input 
+                type="text" 
+                id="city-name"
+                value={@new_city} 
+                phx-keyup="update_new_city"
+                phx-value-value={@new_city}
+                class="w-full border-2 border-gray-300 rounded-md p-3 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            
+            <button 
+              phx-click="add_city" 
+              phx-value-city={@new_city}
+              class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-8 rounded-md"
+            >
+              ADD
+            </button>
+          </div>
         </div>
       </div>
     </div>
