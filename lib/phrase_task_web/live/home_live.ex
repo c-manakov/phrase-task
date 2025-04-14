@@ -87,6 +87,7 @@ defmodule PhraseTaskWeb.HomeLive do
   
   @impl true
   def render(assigns) do
+    # the gradient makes the right part of the styling look washed, also the background doesn't look good considering that root background is just white. Feel free to modify  lib/phrase_task_web/components/layouts/app.html.heex as well AI!
     ~H"""
     <div class="min-h-screen bg-gradient-to-br from-indigo-50 to-white py-12">
       <div class="container mx-auto px-4 max-w-2xl">
