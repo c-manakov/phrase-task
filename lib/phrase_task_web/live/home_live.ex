@@ -87,6 +87,7 @@ defmodule PhraseTaskWeb.HomeLive do
   
   @impl true
   def render(assigns) do
+    # let's add some styling to make this pretty AI!
     ~H"""
     <div class="container">
       <h1>Timezone Converter</h1>
