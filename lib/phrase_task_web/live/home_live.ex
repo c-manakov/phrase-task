@@ -87,105 +87,98 @@ defmodule PhraseTaskWeb.HomeLive do
   
   @impl true
   def render(assigns) do
-    # the gradient makes the right part of the styling look washed, also the background doesn't look good considering that root background is just white. Feel free to modify  lib/phrase_task_web/components/layouts/app.html.heex as well AI!
     ~H"""
-    <div class="min-h-screen bg-gradient-to-br from-indigo-50 to-white py-12">
-      <div class="container mx-auto px-4 max-w-2xl">
-        <h1 class="text-4xl font-extrabold text-indigo-900 mb-16 text-center">
-          <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-            Timezone Converter
-          </span>
-        </h1>
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900 mb-10 text-center">
+        Timezone Converter
+      </h1>
         
-        <div class="bg-white rounded-2xl shadow-xl p-8 mb-10">
-          <h2 class="text-xl font-medium text-gray-700 mb-4">Enter time</h2>
-          <input 
-            type="text" 
-            value={@input_time} 
-            phx-keyup="update_time"
-            phx-value-value={@input_time}
-            class="w-full border border-gray-200 rounded-xl p-4 text-xl mb-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 shadow-sm"
-          />
-          <div>
-            <a 
-              href="#" 
-              phx-click="use_current_time" 
-              class="text-indigo-600 hover:text-indigo-800 text-sm font-medium transition duration-200"
-            >
-              Use current time
-            </a>
-          </div>
+      <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 class="text-xl font-medium text-gray-800 mb-4">Enter time</h2>
+        <input 
+          type="text" 
+          value={@input_time} 
+          phx-keyup="update_time"
+          phx-value-value={@input_time}
+          class="w-full border border-gray-300 rounded-md p-3 text-lg mb-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+        />
+        <div>
+          <a 
+            href="#" 
+            phx-click="use_current_time" 
+            class="text-blue-600 hover:text-blue-800 text-sm font-medium transition duration-200"
+          >
+            Use current time
+          </a>
         </div>
+      </div>
         
-        <div class="bg-white rounded-2xl shadow-xl p-8 mb-10">
-          <h2 class="text-xl font-medium text-gray-700 mb-6">Your timezones</h2>
-          
-          <%= if @cities == [] do %>
-            <div class="py-8 text-center text-gray-500 italic">
-              No cities added yet. Add your first city below.
+      <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 class="text-xl font-medium text-gray-800 mb-4">Your timezones</h2>
+        
+        <%= if @cities == [] do %>
+          <div class="py-6 text-center text-gray-500 italic">
+            No cities added yet. Add your first city below.
+          </div>
+        <% else %>
+          <div class="mb-6">
+            <div class="grid grid-cols-12 text-sm font-medium text-gray-500 mb-2 px-2">
+              <div class="col-span-5">City</div>
+              <div class="col-span-3">Time</div>
+              <div class="col-span-3">TZ</div>
+              <div class="col-span-1"></div>
             </div>
-          <% else %>
-            <div class="mb-6 overflow-hidden">
-              <div class="grid grid-cols-12 text-sm font-medium text-gray-500 mb-2 px-4">
-                <div class="col-span-5">City</div>
-                <div class="col-span-3">Time</div>
-                <div class="col-span-3">TZ</div>
-                <div class="col-span-1"></div>
-              </div>
-              
-              <div class="divide-y divide-gray-100">
-                <%= for {city, index} <- Enum.with_index(@cities) do %>
-                  <div class="grid grid-cols-12 py-4 px-4 hover:bg-gray-50 transition duration-150 rounded-lg items-center">
-                    <div class="col-span-5 font-medium text-gray-900"><%= city.name %></div>
-                    <div class="col-span-3 font-mono text-gray-800"><%= convert_time(@current_time, city.timezone) %></div>
-                    <div class="col-span-3 text-sm text-gray-500"><%= get_timezone_abbreviation(city.timezone) %></div>
-                    <div class="col-span-1 text-right">
-                      <button 
-                        phx-click="remove_city" 
-                        phx-value-index={index}
-                        class="text-gray-400 hover:text-red-500 transition duration-200 rounded-full p-1"
-                        aria-label="Remove city"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                        </svg>
-                      </button>
-                    </div>
+            
+            <div class="divide-y divide-gray-200">
+              <%= for {city, index} <- Enum.with_index(@cities) do %>
+                <div class="grid grid-cols-12 py-3 px-2 hover:bg-gray-50 transition duration-150 items-center">
+                  <div class="col-span-5 font-medium text-gray-900"><%= city.name %></div>
+                  <div class="col-span-3 font-mono text-gray-800"><%= convert_time(@current_time, city.timezone) %></div>
+                  <div class="col-span-3 text-sm text-gray-500"><%= get_timezone_abbreviation(city.timezone) %></div>
+                  <div class="col-span-1 text-right">
+                    <button 
+                      phx-click="remove_city" 
+                      phx-value-index={index}
+                      class="bg-red-100 text-red-600 hover:bg-red-200 transition duration-200 rounded px-2 py-1 text-xs"
+                      aria-label="Remove city"
+                    >
+                      x
+                    </button>
                   </div>
-                <% end %>
-              </div>
-            </div>
-          <% end %>
-          
-          <div class="pt-4 border-t border-gray-100">
-            <div class="flex items-end gap-3">
-              <div class="flex-1">
-                <label for="city-name" class="block mb-2 text-sm font-medium text-gray-700">City name</label>
-                <input 
-                  type="text" 
-                  id="city-name"
-                  value={@new_city} 
-                  phx-keyup="update_new_city"
-                  phx-value-value={@new_city}
-                  placeholder="Enter city name..."
-                  class="w-full border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 shadow-sm"
-                />
-              </div>
-              
-              <button 
-                phx-click="add_city" 
-                phx-value-city={@new_city}
-                class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-xl transition duration-200 shadow-sm"
-              >
-                Add
-              </button>
+                </div>
+              <% end %>
             </div>
           </div>
+        <% end %>
+          
+        <div class="pt-4 border-t border-gray-200">
+          <div class="flex items-end gap-3">
+            <div class="flex-1">
+              <label for="city-name" class="block mb-2 text-sm font-medium text-gray-700">City name</label>
+              <input 
+                type="text" 
+                id="city-name"
+                value={@new_city} 
+                phx-keyup="update_new_city"
+                phx-value-value={@new_city}
+                placeholder="Enter city name..."
+                class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+              />
+            </div>
+            
+            <button 
+              phx-click="add_city" 
+              phx-value-city={@new_city}
+              class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-6 rounded-md transition duration-200"
+            >
+              ADD
+            </button>
+          </div>
         </div>
-        
-        <div class="text-center text-gray-500 text-sm">
-          All times are updated live when using current time
-        </div>
+      </div>
+      
+      <div class="text-center text-gray-500 text-sm">
+        All times are updated live when using current time
       </div>
     </div>
     """
