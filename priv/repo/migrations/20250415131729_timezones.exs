@@ -13,11 +13,16 @@ defmodule PhraseTask.Repo.Migrations.Timezones do
     end
 
     execute "create extension fuzzystrmatch;"
-    execute "create index timezones_title_dm on timezones using gin (daitch_mokotoff(title)) with (fastupdate = off);"
+    execute "create extension pg_trgm;"
+    # We don't need the Daitch-Mokotoff index anymore
+    # Instead we'll use trigram indexes to speed up Levenshtein distance searches
+    execute "create index timezones_title_trgm on timezones using gin (title gin_trgm_ops);"
+    execute "create index timezones_location_trgm on timezones using gin (pretty_timezone_location gin_trgm_ops);"
   end
 
   def down do
-    execute "drop index timezones_title_dm;"
+    execute "drop index timezones_title_trgm;"
+    execute "drop index timezones_location_trgm;"
 
     drop table(:timezones)
   end

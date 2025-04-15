@@ -17,12 +17,16 @@ defmodule PhraseTask.Timezones do
 
   """
   def search_timezones(search_string) when is_binary(search_string) and search_string != "" do
-    # Use Daitch-Mokotoff Soundex for phonetic matching
-    # This helps find names that sound similar even when spelled differently
+    # Use Levenshtein distance with a cutoff of 2
+    # This finds results where the spelling is within 2 character edits
     from(t in Timezone,
-      where: fragment("daitch_mokotoff(?) && daitch_mokotoff(?)", t.title, ^search_string) or
-             fragment("daitch_mokotoff(?) && daitch_mokotoff(?)", t.pretty_timezone_location, ^search_string),
-      order_by: [asc: t.title],
+      where: fragment("levenshtein(?, ?) <= 2", t.title, ^search_string) or
+             fragment("levenshtein(?, ?) <= 2", t.pretty_timezone_location, ^search_string),
+      order_by: [
+        asc: fragment("levenshtein(?, ?)", t.title, ^search_string),
+        asc: fragment("levenshtein(?, ?)", t.pretty_timezone_location, ^search_string),
+        asc: t.title
+      ],
       limit: 20
     )
     |> Repo.all()
