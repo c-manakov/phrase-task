@@ -19,24 +19,17 @@ defmodule PhraseTask.Timezones do
   def search_timezones(search_string) when is_binary(search_string) and search_string != "" do
     # Use a combination of prefix matching and similarity
     # Prioritize exact prefix matches, then fall back to similarity
+# extend the similarity to pretty_timezone_location too AI!
     from(t in Timezone,
       select: %{
         timezone: t,
-        similarity: fragment("GREATEST(similarity(?, ?), similarity(?, ?))", 
-                            t.title, ^search_string,
-                            t.pretty_timezone_location, ^search_string)
+        similarity: fragment("word_similarity(?, ?)", t.title, ^search_string)
       },
       where: ilike(t.title, ^"%#{search_string}%") or
-             ilike(t.pretty_timezone_location, ^"%#{search_string}%") or
-             (fragment("similarity(?, ?) > 0.2", t.title, ^search_string) and not ilike(t.title, ^"%#{search_string}%")) or
-             (fragment("similarity(?, ?) > 0.2", t.pretty_timezone_location, ^search_string) and not ilike(t.pretty_timezone_location, ^"%#{search_string}%")),
+             (fragment("word_similarity(?, ?) > 0.2", t.title, ^search_string) and not ilike(t.title, ^"%#{search_string}%")),
       order_by: [
-        asc: fragment("CASE WHEN ? ILIKE ? OR ? ILIKE ? THEN 0 ELSE 1 END", 
-                     t.title, ^"#{search_string}%",
-                     t.pretty_timezone_location, ^"#{search_string}%"),
-        asc: fragment("LEAST(? <-> ?, ? <-> ?)", 
-                     t.title, ^search_string,
-                     t.pretty_timezone_location, ^search_string),
+        asc: fragment("CASE WHEN ? ILIKE ? THEN 0 ELSE 1 END", t.title, ^"#{search_string}%"),
+        asc: fragment("? <-> ?", t.title, ^search_string),
         asc: t.title
       ],
       limit: 10
