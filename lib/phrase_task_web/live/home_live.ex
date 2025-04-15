@@ -133,13 +133,14 @@ defmodule PhraseTaskWeb.HomeLive do
       <div class="bg-white rounded-lg shadow p-6 mb-8">
         <h2 class="text-xl font-medium text-gray-800 mb-4">Enter time</h2>
 
-        <input
-          type="text"
-          value={format_time(@time)}
-          phx-change="update_time"
-          phx-value-value={@time}
-          class="w-full border border-gray-300 rounded-md p-3 text-lg mb-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-        />
+        <.form for={%{}} phx-change="update_time">
+          <input
+            type="text"
+            name="value"
+            value={format_time(@time)}
+            class="w-full border border-gray-300 rounded-md p-3 text-lg mb-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+          />
+        </.form>
         <%= if not @time_input_valid? do %>
           <div class="text-red-500 text-sm mt-1 mb-2 flex items-center">
             <svg
@@ -216,15 +217,17 @@ defmodule PhraseTaskWeb.HomeLive do
               <label for="city-name" class="block mb-2 text-sm font-medium text-gray-700">
                 City name
               </label>
-              <input
-                type="text"
-                id="city-name"
-                value={@new_city_search_input}
-                phx-change="update_new_city_search_input"
-                placeholder="Enter city name..."
-                class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                autocomplete="off"
-              />
+              <.form for={%{}} phx-change="update_new_city_search_input">
+                <input
+                  type="text"
+                  id="city-name"
+                  name="value"
+                  value={@new_city_search_input}
+                  placeholder="Enter city name..."
+                  class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                  autocomplete="off"
+                />
+              </.form>
               <div
                 id="city-results"
                 class={"absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm"}
@@ -253,12 +256,15 @@ defmodule PhraseTaskWeb.HomeLive do
               </div>
             </div>
 
-            <button
-              phx-click="add_city"
-              class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-6 rounded-md transition duration-200"
-            >
-              ADD
-            </button>
+            <.form for={%{}} phx-submit="add_city">
+              <input type="hidden" name="city" value={@new_city_search_input} />
+              <button
+                type="submit"
+                class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-6 rounded-md transition duration-200"
+              >
+                ADD
+              </button>
+            </.form>
           </div>
         </div>
       </div>
