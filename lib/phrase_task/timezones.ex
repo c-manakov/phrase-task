@@ -19,8 +19,11 @@ defmodule PhraseTask.Timezones do
   def search_timezones(search_string) when is_binary(search_string) and search_string != "" do
     # Use a combination of prefix matching and similarity
     # Prioritize exact prefix matches, then fall back to similarity
-# select and return similarity in the result data as well so I can look at it AI!
     from(t in Timezone,
+      select: %{
+        timezone: t,
+        similarity: fragment("similarity(?, ?)", t.title, ^search_string)
+      },
       where: ilike(t.title, ^"%#{search_string}%") or
              (fragment("similarity(?, ?) > 0.2", t.title, ^search_string) and not ilike(t.title, ^"%#{search_string}%")),
       order_by: [
