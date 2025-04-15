@@ -17,14 +17,33 @@ defmodule PhraseTask.Timezones do
   
   """
   def search_timezones(search_string) when is_binary(search_string) and search_string != "" do
-    search_term = "%#{search_string}%"
+    # First try exact matching with ILIKE
+    exact_matches = 
+      from(t in Timezone,
+        where: ilike(t.title, ^"%#{search_string}%") or
+               ilike(t.pretty_timezone_location, ^"%#{search_string}%"),
+        order_by: t.title
+      )
+      |> Repo.all()
     
-    from(t in Timezone,
-      where: ilike(t.title, ^search_term) or
-             ilike(t.pretty_timezone_location, ^search_term),
-      order_by: t.title
-    )
-    |> Repo.all()
+    # If we have exact matches, return them
+    if length(exact_matches) > 0 do
+      exact_matches
+    else
+      # Otherwise, use trigram similarity for fuzzy matching
+      # This helps with typos and misspellings
+      from(t in Timezone,
+        where: fragment("? % ?", t.title, ^search_string) or
+               fragment("? % ?", t.pretty_timezone_location, ^search_string),
+        order_by: [
+          desc: fragment("similarity(?, ?)", t.title, ^search_string),
+          desc: fragment("similarity(?, ?)", t.pretty_timezone_location, ^search_string),
+          asc: t.title
+        ],
+        limit: 10
+      )
+      |> Repo.all()
+    end
   end
   
   def search_timezones(_), do: []
