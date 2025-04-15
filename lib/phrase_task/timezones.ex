@@ -19,6 +19,7 @@ defmodule PhraseTask.Timezones do
   def search_timezones(search_string) when is_binary(search_string) and search_string != "" do
     # Use a combination of prefix matching and similarity
     # Prioritize exact prefix matches, then fall back to similarity
+# extend the similarity to pretty_timezone_location too AI!
     from(t in Timezone,
       select: %{
         timezone: t,
