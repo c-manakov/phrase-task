@@ -17,7 +17,7 @@ defmodule PhraseTask.Timezones do
 
   """
   def search_timezones(search_string) when is_binary(search_string) and search_string != "" do
-    # First try exact matching with ILIKE
+    # I think we can just use daitch mokotoff here and not have a separate clause for exact matches. This will be used as autocomplete AI!
     exact_matches =
       from(t in Timezone,
         where:
