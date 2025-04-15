@@ -12,12 +12,12 @@ defmodule PhraseTask.Repo.Migrations.Timezones do
       timestamps()
     end
 
-    execute "create extension pg_tgrm;"
-    execute "create index timezones_title_tgrm ON timezones USING gin (title gin_trgm_ops);"
+    execute "create extension pg_trgm;"
+    execute "create index timezones_title_trgm ON timezones USING gin (title gin_trgm_ops);"
   end
 
   def down do
-    execute "drop index timezones_title_tgrm;"
+    execute "drop index timezones_title_trgm;"
 
     drop table(:timezones)
   end
