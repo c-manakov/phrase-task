@@ -189,14 +189,11 @@ defmodule PhraseTaskWeb.HomeLive do
     socket
   end
   
-# instead of pad_number and custom solution use a function from here: https://hexdocs.pm/elixir/DateTime.html AI!
   defp format_time(datetime) do
-    # Format time as HH:MM
-    "#{pad_number(datetime.hour)}:#{pad_number(datetime.minute)}"
-  end
-  
-  defp pad_number(number) do
-    number |> Integer.to_string() |> String.pad_leading(2, "0")
+    # Format time as HH:MM using DateTime's to_iso8601 and extracting just the time part
+    datetime
+    |> DateTime.to_iso8601()
+    |> String.slice(11, 5)
   end
   
   defp convert_time(datetime, timezone) do
@@ -214,9 +211,10 @@ defmodule PhraseTaskWeb.HomeLive do
       _ -> 0
     end
     
-    # Add the offset to the UTC time
-    new_hour = rem(datetime.hour + hours_offset + 24, 24)
-    "#{pad_number(new_hour)}:#{pad_number(datetime.minute)}"
+    # Add the offset to the UTC time using DateTime.add
+    datetime
+    |> DateTime.add(hours_offset * 3600, :second)
+    |> format_time()
   end
   
   defp get_timezone_abbreviation(timezone) do
