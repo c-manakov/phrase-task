@@ -18,7 +18,7 @@ defmodule PhraseTask.Timezones do
   """
   def search_timezones(search_string) when is_binary(search_string) and search_string != "" do
     # Use a combination of prefix matching and similarity
-# when running this with "moscow" it returns 3 results and 2 of them don't match exactly. What could be the problem AI?
+    # create a separate query for ilike match and if it doesn't match then do the similarity AI!
     from(t in Timezone,
       select: %{
         timezone: t,
