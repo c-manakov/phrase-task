@@ -189,45 +189,22 @@ defmodule PhraseTaskWeb.HomeLive do
     socket
   end
   
-# let's use Timex for converting and formatting AI!
   defp format_time(datetime) do
-    # Format time as HH:MM using DateTime's to_iso8601 and extracting just the time part
-    datetime
-    |> DateTime.to_iso8601()
-    |> String.slice(11, 5)
+    # Format time as HH:MM using Timex
+    Timex.format!(datetime, "%H:%M", :strftime)
   end
   
   defp convert_time(datetime, timezone) do
-    # In a real app, we would use a proper timezone conversion library
-    # For this demo, we'll just add some hours based on the timezone name
-    
-    # This is a very simplified approach - in a real app use a proper timezone library
-    hours_offset = case timezone do
-      "Europe/Berlin" -> 2
-      "Asia/Shanghai" -> 8
-      "America/New_York" -> -4
-      "Europe/London" -> 1
-      "Asia/Tokyo" -> 9
-      "Australia/Sydney" -> 10
-      _ -> 0
-    end
-    
-    # Add the offset to the UTC time using DateTime.add
+    # Convert the datetime to the specified timezone using Timex
     datetime
-    |> DateTime.add(hours_offset * 3600, :second)
+    |> Timex.to_datetime()
+    |> Timex.Timezone.convert(timezone)
     |> format_time()
   end
   
   defp get_timezone_abbreviation(timezone) do
-    # This is a simplified approach - in a real app use a proper timezone library
-    case timezone do
-      "Europe/Berlin" -> "CEST"
-      "Asia/Shanghai" -> "CST"
-      "America/New_York" -> "EDT"
-      "Europe/London" -> "BST"
-      "Asia/Tokyo" -> "JST"
-      "Australia/Sydney" -> "AEST"
-      _ -> "UTC"
-    end
+    # Get the timezone abbreviation using Timex
+    datetime = Timex.now(timezone)
+    Timex.format!(datetime, "%Z", :strftime)
   end
 end
