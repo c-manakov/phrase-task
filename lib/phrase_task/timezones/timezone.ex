@@ -12,10 +12,23 @@ defmodule PhraseTask.Timezones.Timezone do
     timestamps()
   end
 
+  # move the fields to @fields value here and cast and require them all AI!
   @doc false
   def changeset(timezone, attrs) do
     timezone
-    |> cast(attrs, [:title, :timezone_id, :pretty_timezone_location, :timezone_abbr, :utc_to_dst_offset])
-    |> validate_required([:title, :timezone_id])
+    |> cast(attrs, [
+      :title,
+      :timezone_id,
+      :pretty_timezone_location,
+      :timezone_abbr,
+      :utc_to_dst_offset
+    ])
+    |> validate_required([
+      :title,
+      :timezone_id,
+      :pretty_timezone_location,
+      :timezone_abbr,
+      :utc_to_dst_offset
+    ])
   end
 end
