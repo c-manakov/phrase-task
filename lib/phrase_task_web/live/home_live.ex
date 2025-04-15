@@ -106,9 +106,6 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def render(assigns) do
-    # i need to implement autocomplete dropdown for city names, use something like js toggle as described here:
-    # https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.JS.html
-    # create markdown and styling for it for now, I will implement the search functionality myself AI! 
     ~H"""
     <div>
       <h1 class="text-3xl font-bold text-gray-900 mb-10 text-center">
@@ -197,7 +194,7 @@ defmodule PhraseTaskWeb.HomeLive do
 
         <div class="pt-4 border-t border-gray-200">
           <div class="flex items-end gap-3">
-            <div class="flex-1">
+            <div class="flex-1 relative">
               <label for="city-name" class="block mb-2 text-sm font-medium text-gray-700">
                 City name
               </label>
@@ -209,7 +206,33 @@ defmodule PhraseTaskWeb.HomeLive do
                 phx-value-value={@new_city}
                 placeholder="Enter city name..."
                 class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                autocomplete="off"
               />
+              
+              <div 
+                id="city-results"
+                class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm hidden"
+                phx-click-away={JS.hide(to: "#city-results")}
+              >
+                <div class="city-result-items">
+                  <!-- Results will be inserted here when you implement the search functionality -->
+                  <div class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100">
+                    <div class="flex items-center">
+                      <span class="font-normal block truncate">Example City</span>
+                    </div>
+                  </div>
+                  <div class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100">
+                    <div class="flex items-center">
+                      <span class="font-normal block truncate">Another City</span>
+                    </div>
+                  </div>
+                  <div class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100">
+                    <div class="flex items-center">
+                      <span class="font-normal block truncate">Third Example</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <button
