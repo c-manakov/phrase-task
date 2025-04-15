@@ -13,9 +13,8 @@ defmodule PhraseTaskWeb.HomeLive do
     
     {:ok, 
      socket
-     |> assign(:current_time, current_time)
+     |> assign(:time, current_time)
      |> assign(:use_current_time, true)
-     |> assign(:input_time, format_time(current_time))
      |> assign(:cities, cities)
      |> assign(:new_city, "")
      |> schedule_time_update()}
@@ -28,10 +27,9 @@ defmodule PhraseTaskWeb.HomeLive do
     socket = 
       if socket.assigns.use_current_time do
         socket
-        |> assign(:current_time, current_time)
-        |> assign(:input_time, format_time(current_time))
+        |> assign(:time, current_time)
       else
-        assign(socket, :current_time, current_time)
+        socket
       end
     
     {:noreply, schedule_time_update(socket)}
@@ -41,7 +39,7 @@ defmodule PhraseTaskWeb.HomeLive do
   def handle_event("update_time", %{"value" => value}, socket) do
     {:noreply, 
      socket
-     |> assign(:input_time, value)
+     |> assign(:time, value)
      |> assign(:use_current_time, false)}
   end
   
@@ -51,8 +49,7 @@ defmodule PhraseTaskWeb.HomeLive do
     
     {:noreply, 
      socket
-     |> assign(:current_time, current_time)
-     |> assign(:input_time, format_time(current_time))
+     |> assign(:time, current_time)
      |> assign(:use_current_time, true)}
   end
   
@@ -97,9 +94,9 @@ defmodule PhraseTaskWeb.HomeLive do
         <h2 class="text-xl font-medium text-gray-800 mb-4">Enter time</h2>
         <input 
           type="text" 
-          value={@input_time} 
+          value={format_time(@time)} 
           phx-keyup="update_time"
-          phx-value-value={@input_time}
+          phx-value-value={@time}
           class="w-full border border-gray-300 rounded-md p-3 text-lg mb-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
         />
         <div>
@@ -133,7 +130,7 @@ defmodule PhraseTaskWeb.HomeLive do
               <%= for {city, index} <- Enum.with_index(@cities) do %>
                 <div class="grid grid-cols-12 py-3 px-2 hover:bg-gray-50 transition duration-150 items-center">
                   <div class="col-span-5 font-medium text-gray-900"><%= city.name %></div>
-                  <div class="col-span-3 font-mono text-gray-800"><%= convert_time(@current_time, city.timezone) %></div>
+                  <div class="col-span-3 font-mono text-gray-800"><%= convert_time(@time, city.timezone) %></div>
                   <div class="col-span-3 text-sm text-gray-500"><%= get_timezone_abbreviation(city.timezone) %></div>
                   <div class="col-span-1 text-right">
                     <button 
@@ -192,6 +189,7 @@ defmodule PhraseTaskWeb.HomeLive do
     socket
   end
   
+# instead of pad_number and custom solution use a function from here: https://hexdocs.pm/elixir/DateTime.html AI!
   defp format_time(datetime) do
     # Format time as HH:MM
     "#{pad_number(datetime.hour)}:#{pad_number(datetime.minute)}"
