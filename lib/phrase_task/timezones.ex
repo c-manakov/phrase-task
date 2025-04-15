@@ -31,16 +31,11 @@ defmodule PhraseTask.Timezones do
     if length(exact_matches) > 0 do
       exact_matches
     else
-      # Use PostgreSQL's trigram similarity operator (%) for fuzzy matching
+      # Use Daitch-Mokotoff Soundex for phonetic matching
+      # This helps find names that sound similar even when spelled differently
       from(t in Timezone,
-        # where:
-        #   fragment("? % ?", t.title, ^search_string) or
-        #     fragment("? % ?", t.pretty_timezone_location, ^search_string),
-        order_by: [
-          desc: fragment("similarity(?, ?)", t.title, ^search_string),
-          desc: fragment("similarity(?, ?)", t.pretty_timezone_location, ^search_string),
-          asc: t.title
-        ],
+        where: fragment("daitch_mokotoff(?) && daitch_mokotoff(?)", t.title, ^search_string),
+        order_by: [asc: t.title],
         limit: 10
       )
       |> Repo.all()
