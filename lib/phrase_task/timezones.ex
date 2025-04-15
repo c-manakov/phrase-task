@@ -23,10 +23,10 @@ defmodule PhraseTask.Timezones do
     from(t in Timezone,
       select: %{
         timezone: t,
-        similarity: fragment("word_similarity(?, ?)", t.title, ^search_string)
+        similarity: fragment("word_similarity(?, ?)", ^search_string, t.title)
       },
       where: ilike(t.title, ^"%#{search_string}%") or
-             (fragment("word_similarity(?, ?) > 0.2", t.title, ^search_string) and not ilike(t.title, ^"%#{search_string}%")),
+             (fragment("word_similarity(?, ?) > 0.2", ^search_string, t.title) and not ilike(t.title, ^"%#{search_string}%")),
       order_by: [
         asc: fragment("CASE WHEN ? ILIKE ? THEN 0 ELSE 1 END", t.title, ^"#{search_string}%"),
         asc: fragment("? <-> ?", t.title, ^search_string),
