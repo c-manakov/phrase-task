@@ -17,29 +17,15 @@ defmodule PhraseTask.Timezones do
 
   """
   def search_timezones(search_string) when is_binary(search_string) and search_string != "" do
-    # I think we can just use daitch mokotoff here and not have a separate clause for exact matches. This will be used as autocomplete AI!
-    exact_matches =
-      from(t in Timezone,
-        where:
-          ilike(t.title, ^"%#{search_string}%") or
-            ilike(t.pretty_timezone_location, ^"%#{search_string}%"),
-        order_by: t.title
-      )
-      |> Repo.all()
-
-    # If we have exact matches, return them
-    if length(exact_matches) > 0 do
-      exact_matches
-    else
-      # Use Daitch-Mokotoff Soundex for phonetic matching
-      # This helps find names that sound similar even when spelled differently
-      from(t in Timezone,
-        where: fragment("daitch_mokotoff(?) && daitch_mokotoff(?)", t.title, ^search_string),
-        order_by: [asc: t.title],
-        limit: 10
-      )
-      |> Repo.all()
-    end
+    # Use Daitch-Mokotoff Soundex for phonetic matching
+    # This helps find names that sound similar even when spelled differently
+    from(t in Timezone,
+      where: fragment("daitch_mokotoff(?) && daitch_mokotoff(?)", t.title, ^search_string) or
+             fragment("daitch_mokotoff(?) && daitch_mokotoff(?)", t.pretty_timezone_location, ^search_string),
+      order_by: [asc: t.title],
+      limit: 20
+    )
+    |> Repo.all()
   end
 
   def search_timezones(_), do: []
