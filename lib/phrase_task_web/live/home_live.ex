@@ -11,7 +11,8 @@ defmodule PhraseTaskWeb.HomeLive do
      |> assign(:time, current_time)
      |> assign(:use_current_time, true)
      |> assign(:cities, [])
-     |> assign(:new_city_search, "")
+     |> assign(:new_city_search_input, "")
+     |> assign(:new_city, nil)
      |> assign(:time_input_valid?, true)
      |> assign(:new_city_search_results, [])
      |> schedule_time_update()}
@@ -93,22 +94,23 @@ defmodule PhraseTaskWeb.HomeLive do
   end
 
   @impl true
-  def handle_event("update_new_city_search", %{"value" => value}, socket) do
+  def handle_event("update_new_city_search_input", %{"value" => value}, socket) do
     {:ok, results} = PhraseTask.Timezones.search_timezones(value)
 
     socket =
       socket
-      |> assign(:new_city_search, value)
+      |> assign(:new_city_search_input, value)
       |> assign(:new_city_search_results, results)
 
     {:noreply, socket}
   end
 
   @impl true
-  def handle_event("select_city", %{"city" => city}, socket) do
+  def handle_event("select_city", %{"timezone" => timezone}, socket) do
     {:noreply,
      socket
-     |> assign(:new_city_search, city)
+     |> assign(:new_city_search_input, timezone.pretty_timezone_location)
+     |> assign(:new_city, timezone)
      |> assign(:new_city_search_results, [])}
   end
 
@@ -134,7 +136,7 @@ defmodule PhraseTaskWeb.HomeLive do
         <input
           type="text"
           value={format_time(@time)}
-          phx-keyup="update_time"
+          phx-change="update_time"
           phx-value-value={@time}
           class="w-full border border-gray-300 rounded-md p-3 text-lg mb-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
         />
@@ -217,33 +219,32 @@ defmodule PhraseTaskWeb.HomeLive do
               <input
                 type="text"
                 id="city-name"
-                value={@new_city_search}
-                phx-keyup="update_new_city_search"
-                phx-value-value={@new_city_search}
+                value={@new_city_search_input}
+                phx-change="update_new_city_search_input"
                 placeholder="Enter city name..."
                 class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                 autocomplete="off"
               />
-
               <div
                 id="city-results"
-                class={"absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm #{if Enum.empty?(@new_city_search_results), do: \"hidden\"}"}
+                class={"absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm"}
+                :if={!Enum.empty?(@new_city_search_results)}
                 phx-click-away={JS.hide(to: "#city-results")}
               >
                 <div class="city-result-items">
-                  <%= if @new_city_search != "" && Enum.empty?(@new_city_search_results) do %>
+                  <%= if @new_city_search_input != "" && Enum.empty?(@new_city_search_results) do %>
                     <div class="py-2 px-3 text-gray-500 italic">
                       No matching cities found
                     </div>
                   <% else %>
-                    <%= for city <- @new_city_search_results do %>
+                    <%= for timezone <- @new_city_search_results do %>
                       <div 
                         class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100"
                         phx-click="select_city"
-                        phx-value-city={city.timezone.title}
+                        phx-value-timezone={timezone}
                       >
                         <div class="flex items-center">
-                          <span class="font-normal block truncate"><%= city.timezone.title %></span>
+                          <span class="font-normal block truncate"><%= timezone.pretty_timezone_location %></span>
                         </div>
                       </div>
                     <% end %>
@@ -254,7 +255,6 @@ defmodule PhraseTaskWeb.HomeLive do
 
             <button
               phx-click="add_city"
-              phx-value-city={@new_city_search}
               class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-6 rounded-md transition duration-200"
             >
               ADD
