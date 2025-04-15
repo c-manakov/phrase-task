@@ -110,7 +110,6 @@ defmodule PhraseTaskWeb.HomeLive do
     {:noreply, assign(socket, :cities, updated_cities)}
   end
 
-  # if time_input_valid? is false I want to render a pretty error message under the input that the inserted time is not valid AI!
   @impl true
   def render(assigns) do
     ~H"""
@@ -129,6 +128,14 @@ defmodule PhraseTaskWeb.HomeLive do
           phx-value-value={@time}
           class="w-full border border-gray-300 rounded-md p-3 text-lg mb-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
         />
+        <%= if not @time_input_valid? do %>
+          <div class="text-red-500 text-sm mt-1 mb-2 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+            Please enter a valid time in HH:MM format
+          </div>
+        <% end %>
         <div>
           <a
             href="#"
