@@ -6,17 +6,11 @@ defmodule PhraseTaskWeb.HomeLive do
   def mount(_params, _session, socket) do
     current_time = Timex.now()
 
-    # Sample cities with timezones - in a real app these would come from a database
-    cities = [
-      %{name: "Hamburg", timezone: "Europe/Berlin"},
-      %{name: "Beijing", timezone: "Asia/Shanghai"}
-    ]
-
     {:ok,
      socket
      |> assign(:time, current_time)
      |> assign(:use_current_time, true)
-     |> assign(:cities, cities)
+     |> assign(:cities, [])
      |> assign(:new_city, "")
      |> assign(:time_input_valid?, true)
      |> schedule_time_update()}
@@ -43,10 +37,10 @@ defmodule PhraseTaskWeb.HomeLive do
 
     parse_time(input_value)
     |> case do
-      {:ok, time} ->
+      {:ok, _time} ->
         {:noreply, socket |> assign(:time_input_valid?, true)}
 
-      otherwise ->
+      _ ->
         {:noreply, socket |> assign(:time_input_valid?, false)}
     end
   end
@@ -64,8 +58,8 @@ defmodule PhraseTaskWeb.HomeLive do
          |> assign(:time_input_valid?, true)}
 
       otherwise ->
-        {:noreply, 
-         socket 
+        {:noreply,
+         socket
          |> assign(:time_input, value)
          |> schedule_validity_check()}
     end
@@ -112,6 +106,9 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def render(assigns) do
+    # i need to implement autocomplete dropdown for city names, use something like js toggle as described here:
+    # https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.JS.html
+    # create markdown and styling for it for now, I will implement the search functionality myself AI! 
     ~H"""
     <div>
       <h1 class="text-3xl font-bold text-gray-900 mb-10 text-center">
@@ -130,8 +127,17 @@ defmodule PhraseTaskWeb.HomeLive do
         />
         <%= if not @time_input_valid? do %>
           <div class="text-red-500 text-sm mt-1 mb-2 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-1"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                clip-rule="evenodd"
+              />
             </svg>
             Please enter a valid time in HH:MM format
           </div>
@@ -234,7 +240,7 @@ defmodule PhraseTaskWeb.HomeLive do
 
   defp schedule_validity_check(socket) do
     if connected?(socket) do
-      Process.send_after(self(), :check_if_valid, 3000)
+      Process.send_after(self(), :check_if_valid, 5000)
     end
 
     socket
