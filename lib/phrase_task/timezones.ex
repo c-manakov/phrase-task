@@ -17,23 +17,38 @@ defmodule PhraseTask.Timezones do
 
   """
   def search_timezones(search_string) when is_binary(search_string) and search_string != "" do
-    # Use a combination of prefix matching and similarity
-    # create a separate query for ilike match and if it doesn't match then do the similarity AI!
-    from(t in Timezone,
-      select: %{
-        timezone: t,
-        similarity: fragment("word_similarity(?, ?)", ^search_string, t.title)
-      },
-      where: ilike(t.title, ^"%#{search_string}%") or
-             (fragment("word_similarity(?, ?) > 0.2", ^search_string, t.title) and not ilike(t.title, ^"%#{search_string}%")),
-      order_by: [
-        asc: fragment("CASE WHEN ? ILIKE ? THEN 0 ELSE 1 END", t.title, ^"#{search_string}%"),
-        asc: fragment("? <-> ?", t.title, ^search_string),
-        asc: t.title
-      ],
-      limit: 3 
-    )
-    |> Repo.all()
+    # First try to find matches using substring
+    substring_matches = 
+      from(t in Timezone,
+        select: %{timezone: t, similarity: 1.0},
+        where: ilike(t.title, ^"%#{search_string}%"),
+        order_by: [
+          asc: fragment("CASE WHEN ? ILIKE ? THEN 0 ELSE 1 END", t.title, ^"#{search_string}%"),
+          asc: t.title
+        ],
+        limit: 3
+      )
+      |> Repo.all()
+
+    # If we have substring matches, return them
+    if length(substring_matches) > 0 do
+      substring_matches
+    else
+      # Otherwise, use similarity search
+      from(t in Timezone,
+        select: %{
+          timezone: t,
+          similarity: fragment("word_similarity(?, ?)", ^search_string, t.title)
+        },
+        where: fragment("word_similarity(?, ?) > 0.2", ^search_string, t.title),
+        order_by: [
+          desc: fragment("word_similarity(?, ?)", ^search_string, t.title),
+          asc: t.title
+        ],
+        limit: 3 
+      )
+      |> Repo.all()
+    end
   end
 
   def search_timezones(_), do: []
