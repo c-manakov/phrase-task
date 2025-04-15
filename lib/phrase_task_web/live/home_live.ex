@@ -39,12 +39,12 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def handle_info(:check_if_valid, socket) do
-    input_value = socket.time_input
+    input_value = socket.assigns.time_input
 
     parse_time(input_value)
     |> case do
       {:ok, time} ->
-        {:noreply, socket}
+        {:noreply, socket |> assign(:time_input_valid?, true)}
 
       otherwise ->
         {:noreply, socket |> assign(:time_input_valid?, false)}
@@ -60,10 +60,14 @@ defmodule PhraseTaskWeb.HomeLive do
          socket
          |> assign(:time, time)
          |> assign(:use_current_time, false)
-         |> assign(:time_input, value)}
+         |> assign(:time_input, value)
+         |> assign(:time_input_valid?, true)}
 
       otherwise ->
-        {:noreply, socket |> assign(:time_input, value)}
+        {:noreply, 
+         socket 
+         |> assign(:time_input, value)
+         |> schedule_validity_check()}
     end
   end
 
