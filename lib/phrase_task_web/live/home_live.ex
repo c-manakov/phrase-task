@@ -189,6 +189,7 @@ defmodule PhraseTaskWeb.HomeLive do
     socket
   end
   
+# let's use Timex for converting and formatting AI!
   defp format_time(datetime) do
     # Format time as HH:MM using DateTime's to_iso8601 and extracting just the time part
     datetime
