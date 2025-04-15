@@ -19,12 +19,20 @@ defmodule PhraseTask.Timezones do
   def search_timezones(search_string) when is_binary(search_string) and search_string != "" do
     # Use Levenshtein distance with a cutoff of 2
     # This finds results where the spelling is within 2 character edits
+# forget the levenstein instead write a query like this using similarity:
+# SELECT name
+# FROM items
+# WHERE name ILIKE 'user_input%'
+#    OR (similarity(name, 'user_input') > 0.6 AND name NOT ILIKE 'user_input%')
+# ORDER BY 
+#    CASE WHEN name ILIKE 'user_input%' THEN 0 ELSE 1 END,
+#    name <-> 'user_input'
+# LIMIT 10;
+# AI!
     from(t in Timezone,
-      where: fragment("levenshtein(?, ?) <= 2", t.title, ^search_string) or
-             fragment("levenshtein(?, ?) <= 2", t.pretty_timezone_location, ^search_string),
+      where: fragment("levenshtein(?, ?, 10, 1, 10) <= 10", t.title, ^search_string),
       order_by: [
-        asc: fragment("levenshtein(?, ?)", t.title, ^search_string),
-        asc: fragment("levenshtein(?, ?)", t.pretty_timezone_location, ^search_string),
+        asc: fragment("levenshtein(?, ?, 10, 1, 10)", t.title, ^search_string),
         asc: t.title
       ],
       limit: 20
