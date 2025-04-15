@@ -9,3 +9,9 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+TzExtra.countries_time_zones()
+|> Enum.map(fn timezone ->
+  # now populate the db with the timezones from TzExtra here AI!
+  dbg(timezone)
+end)
