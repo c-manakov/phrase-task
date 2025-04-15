@@ -105,6 +105,14 @@ defmodule PhraseTaskWeb.HomeLive do
   end
 
   @impl true
+  def handle_event("select_city", %{"city" => city}, socket) do
+    {:noreply,
+     socket
+     |> assign(:new_city_search, city)
+     |> assign(:new_city_search_results, [])}
+  end
+
+  @impl true
   def handle_event("remove_city", %{"index" => index}, socket) do
     index = String.to_integer(index)
     updated_cities = List.delete_at(socket.assigns.cities, index)
@@ -114,7 +122,6 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def render(assigns) do
-    # now render city results here if there are any  AI!
     ~H"""
     <div>
       <h1 class="text-3xl font-bold text-gray-900 mb-10 text-center">
@@ -220,25 +227,27 @@ defmodule PhraseTaskWeb.HomeLive do
 
               <div
                 id="city-results"
-                class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm hidden"
+                class={"absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm #{if Enum.empty?(@new_city_search_results), do: \"hidden\"}"}
                 phx-click-away={JS.hide(to: "#city-results")}
               >
                 <div class="city-result-items">
-                  <div class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100">
-                    <div class="flex items-center">
-                      <span class="font-normal block truncate">Example City</span>
+                  <%= if @new_city_search != "" && Enum.empty?(@new_city_search_results) do %>
+                    <div class="py-2 px-3 text-gray-500 italic">
+                      No matching cities found
                     </div>
-                  </div>
-                  <div class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100">
-                    <div class="flex items-center">
-                      <span class="font-normal block truncate">Another City</span>
-                    </div>
-                  </div>
-                  <div class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100">
-                    <div class="flex items-center">
-                      <span class="font-normal block truncate">Third Example</span>
-                    </div>
-                  </div>
+                  <% else %>
+                    <%= for city <- @new_city_search_results do %>
+                      <div 
+                        class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100"
+                        phx-click="select_city"
+                        phx-value-city={city.timezone.title}
+                      >
+                        <div class="flex items-center">
+                          <span class="font-normal block truncate"><%= city.timezone.title %></span>
+                        </div>
+                      </div>
+                    <% end %>
+                  <% end %>
                 </div>
               </div>
             </div>
