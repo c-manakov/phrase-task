@@ -11,8 +11,9 @@ defmodule PhraseTaskWeb.HomeLive do
      |> assign(:time, current_time)
      |> assign(:use_current_time, true)
      |> assign(:cities, [])
-     |> assign(:new_city, "")
+     |> assign(:new_city_search, "")
      |> assign(:time_input_valid?, true)
+     |> assign(:new_city_search_results, [])
      |> schedule_time_update()}
   end
 
@@ -92,8 +93,15 @@ defmodule PhraseTaskWeb.HomeLive do
   end
 
   @impl true
-  def handle_event("update_new_city", %{"value" => value}, socket) do
-    {:noreply, assign(socket, :new_city, value)}
+  def handle_event("update_new_city_search", %{"value" => value}, socket) do
+    {:ok, results} = PhraseTask.Timezones.search_timezones(value)
+
+    socket =
+      socket
+      |> assign(:new_city_search, value)
+      |> assign(:new_city_search_results, results)
+
+    {:noreply, socket}
   end
 
   @impl true
@@ -106,6 +114,7 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def render(assigns) do
+    # now render city results here if there are any  AI!
     ~H"""
     <div>
       <h1 class="text-3xl font-bold text-gray-900 mb-10 text-center">
@@ -201,21 +210,20 @@ defmodule PhraseTaskWeb.HomeLive do
               <input
                 type="text"
                 id="city-name"
-                value={@new_city}
-                phx-keyup="update_new_city"
-                phx-value-value={@new_city}
+                value={@new_city_search}
+                phx-keyup="update_new_city_search"
+                phx-value-value={@new_city_search}
                 placeholder="Enter city name..."
                 class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                 autocomplete="off"
               />
-              
-              <div 
+
+              <div
                 id="city-results"
                 class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm hidden"
                 phx-click-away={JS.hide(to: "#city-results")}
               >
                 <div class="city-result-items">
-                  <!-- Results will be inserted here when you implement the search functionality -->
                   <div class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100">
                     <div class="flex items-center">
                       <span class="font-normal block truncate">Example City</span>
@@ -237,7 +245,7 @@ defmodule PhraseTaskWeb.HomeLive do
 
             <button
               phx-click="add_city"
-              phx-value-city={@new_city}
+              phx-value-city={@new_city_search}
               class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-6 rounded-md transition duration-200"
             >
               ADD
