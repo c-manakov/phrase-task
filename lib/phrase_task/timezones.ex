@@ -33,9 +33,9 @@ defmodule PhraseTask.Timezones do
     else
       # Use PostgreSQL's trigram similarity operator (%) for fuzzy matching
       from(t in Timezone,
-        where:
-          fragment("? % ?", t.title, ^search_string) or
-            fragment("? % ?", t.pretty_timezone_location, ^search_string),
+        # where:
+        #   fragment("? % ?", t.title, ^search_string) or
+        #     fragment("? % ?", t.pretty_timezone_location, ^search_string),
         order_by: [
           desc: fragment("similarity(?, ?)", t.title, ^search_string),
           desc: fragment("similarity(?, ?)", t.pretty_timezone_location, ^search_string),
