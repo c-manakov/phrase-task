@@ -31,11 +31,7 @@ defmodule PhraseTask.Timezones do
     if length(exact_matches) > 0 do
       exact_matches
     else
-      # this won't work need to insert raw query fragment like so SELECT t, word_similarity('word', t) AS sml
-      # FROM test_trgm
-      # WHERE 'word' % t
-      # ORDER BY sml DESC, t;
-# % is similarity, use this operator AI!
+      # Use PostgreSQL's trigram similarity operator (%) for fuzzy matching
       from(t in Timezone,
         where:
           fragment("? % ?", t.title, ^search_string) or
