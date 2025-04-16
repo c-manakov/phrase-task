@@ -115,12 +115,7 @@ defmodule PhraseTaskWeb.HomeLive do
      |> assign(:new_city_search_input, timezone.title)
      |> assign(:new_city, timezone)
      |> assign(:new_city_search_results, [])
-     |> push_event("focus", %{id: "city-name"})
-     |> enable_add_button()}
-  end
-
-  defp enable_add_button(socket) do
-    socket
+     |> push_event("focus", %{id: "city-name"})}
   end
 
   @impl true
@@ -223,7 +218,12 @@ defmodule PhraseTaskWeb.HomeLive do
         <% end %>
 
         <div class="pt-4 border-t border-gray-200">
-          <.form for={%{}} phx-change="update_new_city_search_input" phx-submit="add_city" class="flex items-end gap-3">
+          <.form
+            for={%{}}
+            phx-change="update_new_city_search_input"
+            phx-submit="add_city"
+            class="flex items-end gap-3"
+          >
             <div class="flex-1 relative">
               <label for="city-name" class="block mb-2 text-sm font-medium text-gray-700">
                 City name
@@ -284,7 +284,6 @@ defmodule PhraseTaskWeb.HomeLive do
     """
   end
 
-
   defp schedule_time_update(socket) do
     if connected?(socket) do
       Process.send_after(self(), :update_time, 1000)
@@ -305,13 +304,14 @@ defmodule PhraseTaskWeb.HomeLive do
     Timex.format!(datetime, "%H:%M", :strftime)
   end
 
+  # flatten this into a with expression AI!
   defp parse_time(datetime_string) do
     Timex.parse(datetime_string, "{h24}:{m}")
     |> case do
       {:ok, time} ->
         today = Timex.today()
-
         local_timezone = Timex.Timezone.local()
+        
         {:ok, time |> Timex.set(date: today) |> Timex.to_datetime(local_timezone)}
 
       otherwise ->
