@@ -96,7 +96,7 @@ defmodule PhraseTask.MixProject do
         applications: [runtime_tools: :permanent],
         steps: [:assemble, :tar],
         config_providers: [
-          {Config.Reader, file: "${RELEASE_ROOT}/config/runtime.exs"}
+          {Config.Reader, path: "${RELEASE_ROOT}/config/runtime.exs"}
         ]
       ]
     ]
