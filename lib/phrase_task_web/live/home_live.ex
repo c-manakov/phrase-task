@@ -107,15 +107,17 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def handle_event("select_city", %{"index" => index}, socket) do
+    dbg()
     index = String.to_integer(index)
     timezone = Enum.at(socket.assigns.new_city_search_results, index)
+
+    dbg()
 
     {:noreply,
      socket
      |> assign(:new_city_search_input, timezone.title)
      |> assign(:new_city, timezone)
      |> assign(:new_city_search_results, [])
-     |> push_focus("#city-name")
      |> enable_add_button()}
   end
 
@@ -255,7 +257,11 @@ defmodule PhraseTaskWeb.HomeLive do
                       <button
                         type="button"
                         class="w-full text-left cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100"
-                        phx-click="select_city"
+                        phx-click={
+                            JS.push("select_city")  
+                            |> JS.push_focus(to: "#city-name")
+                            |> JS.pop_focus()
+                        }
                         phx-value-index={index}
                       >
                         <div class="flex items-center">
