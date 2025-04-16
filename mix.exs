@@ -62,7 +62,7 @@ defmodule PhraseTask.MixProject do
       {:tz, "~> 0.28"},
       {:tz_extra, "~> 0.45"},
       {:live_debugger, "~> 0.1.4", only: :dev},
-      {:patch, "~> 0.15.0", only: [:test]}
+      {:patch, "~> 0.15.0", only: [:test, :dev]}
     ]
   end
 

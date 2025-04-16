@@ -17,10 +17,10 @@ PhraseTask.Repo.delete_all(PhraseTask.Timezones.Timezone)
 TzExtra.countries_time_zones()
 |> Enum.each(fn timezone ->
   PhraseTask.Repo.insert!(%PhraseTask.Timezones.Timezone{
-    title: timezone.name,
-    timezone_id: timezone.identifier,
-    pretty_timezone_location: "#{timezone.country_name} (#{timezone.country_code})",
-    timezone_abbr: timezone.abbreviation,
-    utc_to_dst_offset: timezone.utc_offset
+    title: timezone.title,
+    timezone_id: timezone.time_zone_id,
+    pretty_timezone_location: timezone.pretty_time_zone_location,
+    timezone_abbr: timezone.time_zone_abbr,
+    utc_to_dst_offset: timezone.utc_to_dst_offset
   })
 end)

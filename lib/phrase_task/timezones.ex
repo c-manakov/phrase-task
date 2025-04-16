@@ -17,7 +17,6 @@ defmodule PhraseTask.Timezones do
 
   """
   def search_timezones(search_string) when is_binary(search_string) and search_string != "" do
-    # First try to find matches using substring
     substring_matches =
       from(t in Timezone,
         where: ilike(t.title, ^"%#{search_string}%"),

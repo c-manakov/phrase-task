@@ -12,8 +12,6 @@ defmodule PhraseTask.Repo.Migrations.Timezones do
       timestamps()
     end
 
-    create unique_index(:timezones, [:timezone_id])
-
     execute "create extension pg_trgm;"
 
     # on the dataset of this size (420) this index doesn't really do anything, the planner just opts for a sequential scan, but in case it would somehow be bigger might as well create it

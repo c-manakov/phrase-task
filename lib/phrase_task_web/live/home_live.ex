@@ -126,6 +126,43 @@ defmodule PhraseTaskWeb.HomeLive do
     {:noreply, assign(socket, :cities, updated_cities)}
   end
 
+  defp schedule_time_update(socket) do
+    if connected?(socket) do
+      Process.send_after(self(), :update_time, 1000)
+    end
+
+    socket
+  end
+
+  defp schedule_validity_check(socket) do
+    if connected?(socket) do
+      Process.send_after(self(), :check_if_valid, 5000)
+    end
+
+    socket
+  end
+
+  defp format_time(datetime) do
+    Timex.format!(datetime, "%H:%M", :strftime)
+  end
+
+  defp parse_time(datetime_string) do
+    with {:ok, time} <- Timex.parse(datetime_string, "{h24}:{m}"),
+         today = Timex.today(),
+         local_timezone = Timex.Timezone.local() do
+      {:ok, time |> Timex.set(date: today) |> Timex.to_datetime(local_timezone)}
+    else
+      error -> error
+    end
+  end
+
+  defp convert_time(datetime, timezone) do
+    datetime
+    |> Timex.to_datetime()
+    |> Timex.Timezone.convert(timezone)
+    |> format_time()
+  end
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -283,42 +320,5 @@ defmodule PhraseTaskWeb.HomeLive do
       </div>
     </div>
     """
-  end
-
-  defp schedule_time_update(socket) do
-    if connected?(socket) do
-      Process.send_after(self(), :update_time, 1000)
-    end
-
-    socket
-  end
-
-  defp schedule_validity_check(socket) do
-    if connected?(socket) do
-      Process.send_after(self(), :check_if_valid, 5000)
-    end
-
-    socket
-  end
-
-  defp format_time(datetime) do
-    Timex.format!(datetime, "%H:%M", :strftime)
-  end
-
-  defp parse_time(datetime_string) do
-    with {:ok, time} <- Timex.parse(datetime_string, "{h24}:{m}"),
-         today = Timex.today(),
-         local_timezone = Timex.Timezone.local() do
-      {:ok, time |> Timex.set(date: today) |> Timex.to_datetime(local_timezone)}
-    else
-      error -> error
-    end
-  end
-
-  defp convert_time(datetime, timezone) do
-    datetime
-    |> Timex.to_datetime()
-    |> Timex.Timezone.convert(timezone)
-    |> format_time()
   end
 end
