@@ -46,10 +46,9 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       {:ok, view, _html} = live(conn, "/")
 
       # Enter a specific time
-# so i think here the change needs to be rendered to the form, not the input as it's the form that has phx-change AI!
       html =
         view
-        |> element("#time-input")
+        |> element("#time-form")
         |> render_change(%{value: "14:30"})
 
       # Check if time was updated
@@ -64,7 +63,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
 
       # First set a manual time
       view
-      |> element("#time-input")
+      |> element("#time-form")
       |> render_change(%{value: "14:30"})
 
       # Then switch back to current time
@@ -83,7 +82,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
 
       # Enter an invalid time
       view
-      |> element("#time-input")
+      |> element("#time-form")
       |> render_change(%{value: "invalid"})
 
       # Trigger validity check
@@ -196,7 +195,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
 
       # Set a specific time
       view
-      |> element("#time-input")
+      |> element("#time-form")
       |> render_change(%{value: "12:00"})
 
       # Add New York
