@@ -190,22 +190,12 @@ defmodule PhraseTaskWeb.HomeLive do
       error -> error
     end
   end
-
-  defp convert_time(datetime, timezone) do
-    datetime
-    |> Timex.to_datetime()
-    |> Timex.Timezone.convert(timezone)
-    |> format_time()
-  end
   
-  defp convert_time_with_source(datetime, target_timezone, source_timezone) do
-    # If we have a source timezone, ensure the datetime is properly set to that timezone
+  defp convert_time(datetime, target_timezone, source_timezone) do
     datetime_with_tz = 
       if source_timezone do
-        # First convert to a DateTime if it's not already
         dt = Timex.to_datetime(datetime)
         
-        # If the datetime doesn't have timezone info, set it to the source timezone
         if dt.time_zone == nil || dt.time_zone == "Etc/UTC" do
           Timex.set(dt, [timezone: source_timezone])
         else
@@ -215,7 +205,6 @@ defmodule PhraseTaskWeb.HomeLive do
         Timex.to_datetime(datetime)
       end
     
-    # Now convert to the target timezone
     Timex.Timezone.convert(datetime_with_tz, target_timezone)
     |> format_time()
   end
@@ -292,7 +281,7 @@ defmodule PhraseTaskWeb.HomeLive do
                     {city.pretty_timezone_location}
                   </div>
                   <div class="col-span-3 font-mono text-gray-800">
-                    {convert_time_with_source(@time, city.timezone_id, @client_timezone)}
+                    {convert_time(@time, city.timezone_id, @client_timezone)}
                   </div>
                   <div class="col-span-3 text-sm text-gray-500">
                     {city.timezone_abbr}
