@@ -94,7 +94,7 @@ defmodule PhraseTaskWeb.HomeLive do
   end
 
   @impl true
-  def handle_event("update_new_city_search_input", %{"value" => value}, socket) do
+  def handle_event("update_new_city_search_input", %{"city_name" => value}, socket) do
     {:ok, results} = PhraseTask.Timezones.search_timezones(value)
 
     socket =
@@ -223,22 +223,20 @@ defmodule PhraseTaskWeb.HomeLive do
         <% end %>
 
         <div class="pt-4 border-t border-gray-200">
-          <div class="flex items-end gap-3">
+          <.form for={%{}} phx-change="update_new_city_search_input" phx-submit="add_city" class="flex items-end gap-3">
             <div class="flex-1 relative">
               <label for="city-name" class="block mb-2 text-sm font-medium text-gray-700">
                 City name
               </label>
-              <.form for={%{}} phx-change="update_new_city_search_input" phx-submit="add_city">
-                <input
-                  type="text"
-                  id="city-name"
-                  name="value"
-                  value={@new_city_search_input}
-                  placeholder="Enter city name..."
-                  class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                  autocomplete="off"
-                />
-              </.form>
+              <input
+                type="text"
+                id="city-name"
+                name="city_name"
+                value={@new_city_search_input}
+                placeholder="Enter city name..."
+                class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                autocomplete="off"
+              />
               <div
                 :if={@new_city_search_input != "" && @new_city == nil}
                 id="city-results"
@@ -268,17 +266,14 @@ defmodule PhraseTaskWeb.HomeLive do
               </div>
             </div>
 
-            <.form for={%{}} phx-submit="add_city">
-              <input type="hidden" name="city" value={@new_city_search_input} />
-              <button
-                type="submit"
-                class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-md transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={is_nil(@new_city)}
-              >
-                ADD
-              </button>
-            </.form>
-          </div>
+            <button
+              type="submit"
+              class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-md transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={is_nil(@new_city)}
+            >
+              ADD
+            </button>
+          </.form>
         </div>
       </div>
 
@@ -289,7 +284,6 @@ defmodule PhraseTaskWeb.HomeLive do
     """
   end
 
-# i think we can use just one big form for the input and the add button with a single event AI!
 
   defp schedule_time_update(socket) do
     if connected?(socket) do
