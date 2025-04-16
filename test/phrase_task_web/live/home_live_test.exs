@@ -207,10 +207,9 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       |> element("button[phx-click='select_city'][phx-value-index='0']")
       |> render_click()
 
-      html =
-        view
-        |> element("form[phx-submit='add_city']")
-        |> render_submit()
+      view
+      |> element("form[phx-submit='add_city']")
+      |> render_submit()
 
       # Add London
       view
