@@ -4,7 +4,6 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    # so it seems this is not going to work because this returns server local time, we need client local time and for that we need to get the timezone from the client. How would I do that AI? 
     current_time = Timex.local()
 
     {:ok,
