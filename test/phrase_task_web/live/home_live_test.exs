@@ -23,6 +23,13 @@ defmodule PhraseTaskWeb.HomeLiveTest do
           pretty_timezone_location: "London",
           timezone_abbr: "GMT",
           utc_to_dst_offset: 0
+        },
+        %{
+          title: "Europe/Kyiv",
+          timezone_id: "Europe/Kyiv",
+          pretty_timezone_location: "Kyiv",
+          timezone_abbr: "EET",
+          utc_to_dst_offset: 7200
         }
       ]
 
@@ -191,10 +198,9 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       |> element("form[phx-submit='add_city']")
       |> render_submit()
 
-      # let's use something that's not UTC, like Kyiv AI!
       view
       |> element("form[phx-change='update_new_city_search_input']")
-      |> render_change(%{city_name: "London"})
+      |> render_change(%{city_name: "Kyiv"})
 
       view
       |> element("button[phx-click='select_city'][phx-value-index='0']")
@@ -206,7 +212,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
         |> render_submit()
         
       assert html =~ "New York"
-      assert html =~ "London"
+      assert html =~ "Kyiv"
 
       {:ok, parsed} = Floki.parse_document(html)
       time_elements = Floki.find(parsed, ".col-span-3.font-mono")
@@ -217,9 +223,9 @@ defmodule PhraseTaskWeb.HomeLiveTest do
         Floki.text(element) |> String.trim()
       end)
       
-      # In January, New York is on EST (UTC-5) and London is on GMT (UTC+0)
+      # In January, New York is on EST (UTC-5) and Kyiv is on EET (UTC+2)
       assert Enum.member?(times, "07:00")
-      assert Enum.member?(times, "12:00")
+      assert Enum.member?(times, "14:00")
 
     end
   end
