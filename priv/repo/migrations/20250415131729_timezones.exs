@@ -1,6 +1,6 @@
 defmodule PhraseTask.Repo.Migrations.Timezones do
   use Ecto.Migration
-  
+
   def up do
     create table(:timezones) do
       add :title, :string
@@ -12,17 +12,17 @@ defmodule PhraseTask.Repo.Migrations.Timezones do
       timestamps()
     end
 
-    execute "create extension fuzzystrmatch;"
+# create a unique constraint for timezone_id AI!
+
     execute "create extension pg_trgm;"
-    # We don't need the Daitch-Mokotoff index anymore
-    # Instead we'll use trigram indexes to speed up Levenshtein distance searches
+
+    # on the dataset of this size (420) this index doesn't really do anything, the planner just opts for a sequential scan, but in case it would somehow be bigger might as well create it
     execute "create index timezones_title_trgm on timezones using gin (title gin_trgm_ops);"
-    execute "create index timezones_location_trgm on timezones using gin (pretty_timezone_location gin_trgm_ops);"
   end
 
   def down do
+    execute "drop extension pg_trgm;"
     execute "drop index timezones_title_trgm;"
-    execute "drop index timezones_location_trgm;"
 
     drop table(:timezones)
   end
