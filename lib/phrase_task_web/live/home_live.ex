@@ -304,18 +304,13 @@ defmodule PhraseTaskWeb.HomeLive do
     Timex.format!(datetime, "%H:%M", :strftime)
   end
 
-  # flatten this into a with expression AI!
   defp parse_time(datetime_string) do
-    Timex.parse(datetime_string, "{h24}:{m}")
-    |> case do
-      {:ok, time} ->
-        today = Timex.today()
-        local_timezone = Timex.Timezone.local()
-        
-        {:ok, time |> Timex.set(date: today) |> Timex.to_datetime(local_timezone)}
-
-      otherwise ->
-        otherwise
+    with {:ok, time} <- Timex.parse(datetime_string, "{h24}:{m}"),
+         today = Timex.today(),
+         local_timezone = Timex.Timezone.local() do
+      {:ok, time |> Timex.set(date: today) |> Timex.to_datetime(local_timezone)}
+    else
+      error -> error
     end
   end
 
