@@ -79,8 +79,19 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def handle_event("add_city", _, socket) do
-    # In a real app, we would look up the timezone from a database
-    # For this demo, we'll just assign a random timezone
+    add_selected_city(socket)
+  end
+
+  @impl true
+  def handle_event("add_city_from_input", _params, socket) do
+    if socket.assigns.new_city do
+      add_selected_city(socket)
+    else
+      {:noreply, socket}
+    end
+  end
+
+  defp add_selected_city(socket) do
     new_city = socket.assigns.new_city
     updated_cities = socket.assigns.cities ++ [new_city]
 
@@ -225,7 +236,7 @@ defmodule PhraseTaskWeb.HomeLive do
               <label for="city-name" class="block mb-2 text-sm font-medium text-gray-700">
                 City name
               </label>
-              <.form for={%{}} phx-change="update_new_city_search_input">
+              <.form for={%{}} phx-change="update_new_city_search_input" phx-submit="add_city_from_input">
                 <input
                   type="text"
                   id="city-name"
