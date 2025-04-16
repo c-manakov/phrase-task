@@ -134,7 +134,7 @@ defmodule PhraseTaskWeb.HomeLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div phx-hook="FocusHook">
+    <div phx-hook="FocusHook" id="focus-hook">
       <h1 class="text-3xl font-bold text-gray-900 mb-10 text-center">
         Timezone Converter
       </h1>
@@ -288,6 +288,8 @@ defmodule PhraseTaskWeb.HomeLive do
     </div>
     """
   end
+
+# i think we can use just one big form for the input and the add button with a single event AI!
 
   defp schedule_time_update(socket) do
     if connected?(socket) do
