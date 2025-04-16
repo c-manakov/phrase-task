@@ -98,7 +98,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       # Search for New York
       html =
         view
-        |> element("form[phx-change='update_new_city_search_input'] input#city-name")
+        |> element("form[phx-change='update_new_city_search_input']")
         |> render_change(%{city_name: "New York"})
 
       # Check if search results are displayed
@@ -111,7 +111,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
 
       # Search for New York
       view
-      |> element("form[phx-change='update_new_city_search_input'] input#city-name")
+      |> element("form[phx-change='update_new_city_search_input']")
       |> render_change(%{city_name: "New York"})
 
       # Select the city from search results
@@ -128,9 +128,8 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       {:ok, view, _html} = live(conn, "/")
 
       # Search for New York
-# again, apply the same changes here and to all other tests AI!
       view
-      |> element("form[phx-change='update_new_city_search_input'] input#city-name")
+      |> element("form[phx-change='update_new_city_search_input']")
       |> render_change(%{city_name: "New York"})
 
       # Select the city from search results
@@ -154,7 +153,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
 
       # Add a city
       view
-      |> element("form[phx-change='update_new_city_search_input'] input#city-name")
+      |> element("form[phx-change='update_new_city_search_input']")
       |> render_change(%{city_name: "New York"})
 
       view
@@ -184,7 +183,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       # Search for a non-existent city
       html =
         view
-        |> element("form[phx-change='update_new_city_search_input'] input#city-name")
+        |> element("form[phx-change='update_new_city_search_input']")
         |> render_change(%{city_name: "NonExistentCity"})
 
       # Check if empty results message is displayed
@@ -201,7 +200,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
 
       # Add New York
       view
-      |> element("form[phx-change='update_new_city_search_input'] input#city-name")
+      |> element("form[phx-change='update_new_city_search_input']")
       |> render_change(%{city_name: "New York"})
 
       view
@@ -215,7 +214,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
 
       # Add London
       view
-      |> element("form[phx-change='update_new_city_search_input'] input#city-name")
+      |> element("form[phx-change='update_new_city_search_input']")
       |> render_change(%{city_name: "London"})
 
       view
