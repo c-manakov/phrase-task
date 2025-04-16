@@ -10,10 +10,8 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-# Clear existing timezones
 PhraseTask.Repo.delete_all(PhraseTask.Timezones.Timezone)
 
-# Insert all timezones from TzExtra
 TzExtra.countries_time_zones()
 |> Enum.each(fn timezone ->
   PhraseTask.Repo.insert!(%PhraseTask.Timezones.Timezone{
