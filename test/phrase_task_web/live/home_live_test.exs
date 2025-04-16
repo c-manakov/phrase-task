@@ -46,6 +46,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       {:ok, view, _html} = live(conn, "/")
 
       # Enter a specific time
+# so i think here the change needs to be rendered to the form, not the input as it's the form that has phx-change AI!
       html =
         view
         |> element("#time-input")
