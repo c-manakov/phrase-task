@@ -82,5 +82,43 @@ defmodule PhraseTask.TimezonesTest do
       
       assert length(results) == 5
     end
+
+    test "handles special characters in search string" do
+      # Insert a timezone with special characters
+      {:ok, _} = %Timezone{
+        title: "Europe/Zürich", 
+        timezone_id: "europe_zurich", 
+        pretty_timezone_location: "Zürich", 
+        timezone_abbr: "CET", 
+        utc_to_dst_offset: 3600
+      } |> Repo.insert()
+
+      {:ok, results} = Timezones.search_timezones("Zürich")
+      
+      assert length(results) == 1
+      assert Enum.at(results, 0).title == "Europe/Zürich"
+    end
+
+    test "returns results in correct order for similarity search" do
+      # Insert timezones with similar names
+      similar_timezones = [
+        %{title: "America/Los_Angeles", timezone_id: "america_los_angeles", pretty_timezone_location: "Los Angeles", timezone_abbr: "PST", utc_to_dst_offset: -28800},
+        %{title: "America/Los_Cabos", timezone_id: "america_los_cabos", pretty_timezone_location: "Los Cabos", timezone_abbr: "MST", utc_to_dst_offset: -25200},
+        %{title: "America/Las_Vegas", timezone_id: "america_las_vegas", pretty_timezone_location: "Las Vegas", timezone_abbr: "PST", utc_to_dst_offset: -28800}
+      ]
+      
+      Enum.each(similar_timezones, fn timezone_attrs ->
+        %Timezone{}
+        |> Timezone.changeset(timezone_attrs)
+        |> Repo.insert!()
+      end)
+
+      # Search for something similar to "Los Angeles" but misspelled
+      {:ok, results} = Timezones.search_timezones("Los Angelos")
+      
+      # Should return Los Angeles as the first result due to highest similarity
+      assert length(results) > 0
+      assert Enum.at(results, 0).title == "America/Los_Angeles"
+    end
   end
 end
