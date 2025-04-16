@@ -175,12 +175,10 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       
       {:ok, view, _html} = live(conn, "/")
 
-      # Set a specific time (12:00 UTC)
       view
       |> element("#time-form")
       |> render_change(%{value: "12:00"})
 
-      # Add New York (EST/EDT is UTC-5/UTC-4)
       view
       |> element("form[phx-change='update_new_city_search_input']")
       |> render_change(%{city_name: "New York"})
@@ -193,7 +191,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       |> element("form[phx-submit='add_city']")
       |> render_submit()
 
-      # Add London (GMT/BST is UTC+0/UTC+1)
+      # let's use something that's not UTC, like Kyiv AI!
       view
       |> element("form[phx-change='update_new_city_search_input']")
       |> render_change(%{city_name: "London"})
@@ -207,28 +205,22 @@ defmodule PhraseTaskWeb.HomeLiveTest do
         |> element("form[phx-submit='add_city']")
         |> render_submit()
         
-      # Verify cities are displayed
       assert html =~ "New York"
       assert html =~ "London"
 
-      # Parse the HTML to check the time values
       {:ok, parsed} = Floki.parse_document(html)
       time_elements = Floki.find(parsed, ".col-span-3.font-mono")
       
-      # We should have exactly 2 time elements (one for each city)
       assert Enum.count(time_elements) == 2
       
-      # Extract the time text from the elements
       times = Enum.map(time_elements, fn element -> 
         Floki.text(element) |> String.trim()
       end)
       
       # In January, New York is on EST (UTC-5) and London is on GMT (UTC+0)
-      # So with our fixed date in January:
-      # New York time should be exactly 5 hours behind UTC (07:00)
-      # London time should be exactly the same as UTC (12:00)
       assert Enum.member?(times, "07:00")
       assert Enum.member?(times, "12:00")
+
     end
   end
 end
