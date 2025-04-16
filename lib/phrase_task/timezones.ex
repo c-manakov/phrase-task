@@ -30,21 +30,37 @@ defmodule PhraseTask.Timezones do
       {:ok, substring_matches}
     else
       # Otherwise, use similarity search
-# set word similarity to 0.3 here AI!
-      from(t in Timezone,
-        where: fragment("? <% ?", ^search_string, t.title),
+      execute_with_similarity_threshold(0.3, fn ->
+        from(t in Timezone,
+          where: fragment("? <% ?", ^search_string, t.title),
         order_by: [
           desc: fragment("word_similarity(?, ?)", ^search_string, t.title),
           asc: t.title
         ],
-        limit: 3
-      )
-      |> Repo.all()
-      |> then(&{:ok, &1})
+          limit: 3
+        )
+        |> Repo.all()
+        |> then(&{:ok, &1})
+      end)
     end
   end
 
   def search_timezones(_), do: {:ok, []}
+
+  # Helper function to execute a query with a specific word similarity threshold
+  defp execute_with_similarity_threshold(threshold, query_fn) do
+    # Set the threshold for this session
+    Repo.query!("SET pg_trgm.word_similarity_threshold = #{threshold};")
+    
+    # Execute the query
+    result = query_fn.()
+    
+    # Reset to default (0.2)
+    Repo.query!("SET pg_trgm.word_similarity_threshold = 0.2;")
+    
+    # Return the result
+    result
+  end
 
   @doc """
   Returns the list of all timezones.
