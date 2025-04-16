@@ -79,27 +79,18 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def handle_event("add_city", _, socket) do
-    add_selected_city(socket)
-  end
-
-  @impl true
-  def handle_event("add_city_from_input", _params, socket) do
     if socket.assigns.new_city do
-      add_selected_city(socket)
+      new_city = socket.assigns.new_city
+      updated_cities = socket.assigns.cities ++ [new_city]
+
+      {:noreply,
+       socket
+       |> assign(:cities, updated_cities)
+       |> assign(:new_city_search_input, "")
+       |> assign(:new_city, nil)}
     else
       {:noreply, socket}
     end
-  end
-
-  defp add_selected_city(socket) do
-    new_city = socket.assigns.new_city
-    updated_cities = socket.assigns.cities ++ [new_city]
-
-    {:noreply,
-     socket
-     |> assign(:cities, updated_cities)
-     |> assign(:new_city_search_input, "")
-     |> assign(:new_city, nil)}
   end
 
   @impl true
@@ -236,7 +227,7 @@ defmodule PhraseTaskWeb.HomeLive do
               <label for="city-name" class="block mb-2 text-sm font-medium text-gray-700">
                 City name
               </label>
-              <.form for={%{}} phx-change="update_new_city_search_input" phx-submit="add_city_from_input">
+              <.form for={%{}} phx-change="update_new_city_search_input" phx-submit="add_city">
                 <input
                   type="text"
                   id="city-name"
