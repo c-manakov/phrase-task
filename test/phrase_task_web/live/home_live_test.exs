@@ -294,5 +294,49 @@ defmodule PhraseTaskWeb.HomeLiveTest do
     end
   end
 
-# add a test here to verify that set timezone works AI!
+  test "handles client timezone information", %{conn: conn} do
+    # Mock a fixed date to avoid DST issues
+    fixed_date = ~D[2023-01-15]
+    Patch.patch(Timex, :today, fn -> fixed_date end)
+    
+    # Mock the current time
+    fixed_current_time = Timex.to_datetime({{2023, 1, 15}, {10, 30, 0}}, "UTC")
+    Patch.patch(Timex, :now, fn -> fixed_current_time end)
+    
+    {:ok, view, _html} = live(conn, "/")
+    
+    # Simulate the client sending timezone information
+    send(view.pid, %Phoenix.Socket.Message{
+      event: "event",
+      payload: %{
+        "event" => "set_timezone",
+        "type" => "form",
+        "value" => %{"timezone" => "America/New_York"}
+      }
+    })
+    
+    # Wait for the LiveView to process the message
+    Process.sleep(100)
+    
+    # Verify the time is converted to the client's timezone (UTC-5)
+    html = render(view)
+    assert html =~ "05:30" # 10:30 UTC -> 05:30 EST
+    
+    # Add a city and verify time conversion
+    view
+    |> element("form[phx-change='update_new_city_search_input']")
+    |> render_change(%{city_name: "London"})
+    
+    view
+    |> element("button[phx-click='select_city'][phx-value-index='0']")
+    |> render_click()
+    
+    html = view
+    |> element("form[phx-submit='add_city']")
+    |> render_submit()
+    
+    # London is UTC, so should show 10:30 when client is in New York at 05:30
+    assert html =~ "London"
+    assert html =~ "10:30"
+  end
 end
