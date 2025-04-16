@@ -115,6 +115,7 @@ defmodule PhraseTaskWeb.HomeLive do
      |> assign(:new_city_search_input, timezone.title)
      |> assign(:new_city, timezone)
      |> assign(:new_city_search_results, [])
+     |> push_focus("#city-name")
      |> enable_add_button()}
   end
 
