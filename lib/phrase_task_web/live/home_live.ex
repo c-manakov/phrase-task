@@ -240,7 +240,7 @@ defmodule PhraseTaskWeb.HomeLive do
               <div
                 :if={@new_city_search_input != "" && @new_city == nil}
                 id="city-results"
-                class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm"
+                class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm border border-blue-300"
                 phx-click-away={JS.hide(to: "#city-results")}
               >
                 <div class="city-result-items">
@@ -252,7 +252,7 @@ defmodule PhraseTaskWeb.HomeLive do
                     <%= for {timezone, index} <- Enum.with_index(@new_city_search_results) do %>
                       <button
                         type="button"
-                        class="w-full text-left cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100"
+                        class="w-full text-left cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none"
                         phx-click="select_city"
                         phx-value-index={index}
                       >
