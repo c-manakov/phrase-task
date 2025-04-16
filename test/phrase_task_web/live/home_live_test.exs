@@ -30,6 +30,13 @@ defmodule PhraseTaskWeb.HomeLiveTest do
           pretty_timezone_location: "Kyiv",
           timezone_abbr: "EET",
           utc_to_dst_offset: 7200
+        },
+        %{
+          title: "Pacific/Samoa",
+          timezone_id: "Pacific/Samoa",
+          pretty_timezone_location: "Samoa",
+          timezone_abbr: "SST",
+          utc_to_dst_offset: -39600
         }
       ]
 
@@ -227,7 +234,61 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       assert Enum.member?(times, "07:00")
       assert Enum.member?(times, "14:00")
 
-# now let's change the time and check if it's still valid, then add another city somewhere in the pacific where it's -11, check the times, then change the time back to current AI!
+      # Change the time to 18:00 UTC
+      view
+      |> element("#time-form")
+      |> render_change(%{value: "18:00"})
+
+      # Verify the time was updated
+      html = render(view)
+      assert html =~ "18:00"
+
+      # Add Samoa (UTC-11)
+      view
+      |> element("form[phx-change='update_new_city_search_input']")
+      |> render_change(%{city_name: "Samoa"})
+
+      view
+      |> element("button[phx-click='select_city'][phx-value-index='0']")
+      |> render_click()
+
+      html =
+        view
+        |> element("form[phx-submit='add_city']")
+        |> render_submit()
+
+      # Verify Samoa was added
+      assert html =~ "Samoa"
+
+      # Parse the HTML to check the time values with the new time (18:00 UTC)
+      {:ok, parsed} = Floki.parse_document(html)
+      time_elements = Floki.find(parsed, ".col-span-3.font-mono")
+      
+      # We should have 3 time elements now
+      assert Enum.count(time_elements) == 3
+      
+      # Extract the time text from the elements
+      times = Enum.map(time_elements, fn element -> 
+        Floki.text(element) |> String.trim()
+      end)
+      
+      # With 18:00 UTC:
+      # New York should be 13:00 (UTC-5)
+      # Kyiv should be 20:00 (UTC+2)
+      # Samoa should be 07:00 (UTC-11)
+      assert Enum.member?(times, "13:00")
+      assert Enum.member?(times, "20:00")
+      assert Enum.member?(times, "07:00")
+
+      # Switch back to current time
+      view
+      |> element("a[phx-click='use_current_time']")
+      |> render_click()
+
+      # Verify we're back to current time (the time should be in HH:MM format)
+      html = render(view)
+      assert html =~ ~r/\d{2}:\d{2}/
+      refute html =~ "18:00"
 
     end
   end
