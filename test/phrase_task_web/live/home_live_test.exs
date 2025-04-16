@@ -223,8 +223,8 @@ defmodule PhraseTaskWeb.HomeLiveTest do
 
       html =
         view
-        |> element("button[type='submit']:not([disabled])")
-        |> render_click()
+        |> element("form[phx-submit='add_city']")
+        |> render_submit()
 
       # Check if both cities are displayed with different times
       assert html =~ "New York"
