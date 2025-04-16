@@ -169,6 +169,10 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       # Mock Timex.Timezone.local to return a fixed timezone
       Patch.patch(Timex.Timezone, :local, fn -> Timex.Timezone.get("UTC") end)
       
+      # Mock a fixed date (January 15, 2023) to avoid DST issues
+      fixed_date = ~D[2023-01-15]
+      Patch.patch(Timex, :today, fn -> fixed_date end)
+      
       {:ok, view, _html} = live(conn, "/")
 
       # Set a specific time (12:00 UTC)
@@ -219,12 +223,12 @@ defmodule PhraseTaskWeb.HomeLiveTest do
         Floki.text(element) |> String.trim()
       end)
       
-# instead of doing this thing here with dst we can just mock the current date as well AI!
-      # New York time should be 5 hours behind UTC (07:00)
-      # London time should be the same as UTC (12:00)
-      # Note: This may vary based on daylight saving time
-      assert Enum.member?(times, "07:00") || Enum.member?(times, "08:00") # Depending on DST
-      assert Enum.member?(times, "12:00") || Enum.member?(times, "13:00") # Depending on DST
+      # In January, New York is on EST (UTC-5) and London is on GMT (UTC+0)
+      # So with our fixed date in January:
+      # New York time should be exactly 5 hours behind UTC (07:00)
+      # London time should be exactly the same as UTC (12:00)
+      assert Enum.member?(times, "07:00")
+      assert Enum.member?(times, "12:00")
     end
   end
 end
