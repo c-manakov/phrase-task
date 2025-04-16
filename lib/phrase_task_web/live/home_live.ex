@@ -23,7 +23,10 @@ defmodule PhraseTaskWeb.HomeLive do
   def handle_info(:update_time, socket) do
     current_time = 
       if socket.assigns.client_timezone do
-        Timex.now() |> Timex.Timezone.convert(socket.assigns.client_timezone)
+        # Get the current time in UTC first
+        now = Timex.now()
+        # Then convert it to the client's timezone
+        Timex.Timezone.convert(now, socket.assigns.client_timezone)
       else
         Timex.local()
       end
@@ -77,7 +80,10 @@ defmodule PhraseTaskWeb.HomeLive do
   def handle_event("use_current_time", _params, socket) do
     current_time = 
       if socket.assigns.client_timezone do
-        Timex.now() |> Timex.Timezone.convert(socket.assigns.client_timezone)
+        # Get the current time in UTC first
+        now = Timex.now()
+        # Then convert it to the client's timezone
+        Timex.Timezone.convert(now, socket.assigns.client_timezone)
       else
         Timex.local()
       end
@@ -141,8 +147,10 @@ defmodule PhraseTaskWeb.HomeLive do
   def handle_event("set_timezone", %{"timezone" => timezone}, socket) do
     current_time = 
       if timezone do
-        Timex.now()
-        |> Timex.Timezone.convert(timezone)
+        # Get the current time in UTC first
+        now = Timex.now()
+        # Then convert it to the client's timezone
+        Timex.Timezone.convert(now, timezone)
       else
         Timex.local()
       end
@@ -187,6 +195,28 @@ defmodule PhraseTaskWeb.HomeLive do
     datetime
     |> Timex.to_datetime()
     |> Timex.Timezone.convert(timezone)
+    |> format_time()
+  end
+  
+  defp convert_time_with_source(datetime, target_timezone, source_timezone) do
+    # If we have a source timezone, ensure the datetime is properly set to that timezone
+    datetime_with_tz = 
+      if source_timezone do
+        # First convert to a DateTime if it's not already
+        dt = Timex.to_datetime(datetime)
+        
+        # If the datetime doesn't have timezone info, set it to the source timezone
+        if dt.time_zone == nil || dt.time_zone == "Etc/UTC" do
+          Timex.set(dt, [timezone: source_timezone])
+        else
+          dt
+        end
+      else
+        Timex.to_datetime(datetime)
+      end
+    
+    # Now convert to the target timezone
+    Timex.Timezone.convert(datetime_with_tz, target_timezone)
     |> format_time()
   end
 
@@ -262,7 +292,7 @@ defmodule PhraseTaskWeb.HomeLive do
                     {city.pretty_timezone_location}
                   </div>
                   <div class="col-span-3 font-mono text-gray-800">
-                    {convert_time(@time, city.timezone_id)}
+                    {convert_time_with_source(@time, city.timezone_id, @client_timezone)}
                   </div>
                   <div class="col-span-3 text-sm text-gray-500">
                     {city.timezone_abbr}
