@@ -286,6 +286,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       |> render_click()
 
       # Verify we're back to current time (the time should be in HH:MM format)
+# we can just mock the current time too  AI!
       html = render(view)
       assert html =~ ~r/\d{2}:\d{2}/
       refute html =~ "18:00"
