@@ -16,12 +16,18 @@ defmodule PhraseTaskWeb.HomeLive do
      |> assign(:new_city, nil)
      |> assign(:time_input_valid?, true)
      |> assign(:new_city_search_results, [])
+     |> assign(:client_timezone, nil)
      |> schedule_time_update()}
   end
 
   @impl true
   def handle_info(:update_time, socket) do
-    current_time = Timex.local()
+    current_time = 
+      if socket.assigns.client_timezone do
+        Timex.now() |> Timex.Timezone.convert(socket.assigns.client_timezone)
+      else
+        Timex.local()
+      end
 
     socket =
       if socket.assigns.use_current_time do
@@ -70,7 +76,12 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def handle_event("use_current_time", _params, socket) do
-    current_time = Timex.local()
+    current_time = 
+      if socket.assigns.client_timezone do
+        Timex.now() |> Timex.Timezone.convert(socket.assigns.client_timezone)
+      else
+        Timex.local()
+      end
 
     {:noreply,
      socket
@@ -127,6 +138,23 @@ defmodule PhraseTaskWeb.HomeLive do
     {:noreply, assign(socket, :cities, updated_cities)}
   end
 
+  @impl true
+  def handle_event("set_timezone", %{"timezone" => timezone, "offset" => offset}, socket) do
+    # Convert the time to client's timezone
+    current_time = 
+      if timezone do
+        Timex.now()
+        |> Timex.Timezone.convert(timezone)
+      else
+        Timex.local()
+      end
+
+    {:noreply, 
+     socket
+     |> assign(:client_timezone, timezone)
+     |> assign(:time, current_time)}
+  end
+
   defp schedule_time_update(socket) do
     if connected?(socket) do
       Process.send_after(self(), :update_time, 1000)
@@ -167,7 +195,7 @@ defmodule PhraseTaskWeb.HomeLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div phx-hook="FocusHook" id="focus-hook">
+    <div phx-hook="TimezoneHook" id="focus-hook">
       <h1 class="text-3xl font-bold text-gray-900 mb-10 text-center">
         Timezone Converter
       </h1>
