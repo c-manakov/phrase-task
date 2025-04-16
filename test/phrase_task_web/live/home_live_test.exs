@@ -293,4 +293,6 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       refute html =~ "18:00"
     end
   end
+
+# add a test here to verify that set timezone works AI!
 end

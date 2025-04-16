@@ -138,7 +138,7 @@ defmodule PhraseTaskWeb.HomeLive do
   end
 
   @impl true
-  def handle_event("set_timezone", %{"timezone" => timezone, "offset" => offset}, socket) do
+  def handle_event("set_timezone", %{"timezone" => timezone}, socket) do
     # Convert the time to client's timezone
     current_time = 
       if timezone do
