@@ -12,7 +12,7 @@ defmodule PhraseTask.Repo.Migrations.Timezones do
       timestamps()
     end
 
-# create a unique constraint for timezone_id AI!
+    create unique_index(:timezones, [:timezone_id])
 
     execute "create extension pg_trgm;"
 
