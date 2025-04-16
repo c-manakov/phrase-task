@@ -227,6 +227,8 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       assert Enum.member?(times, "07:00")
       assert Enum.member?(times, "14:00")
 
+# now let's change the time and check if it's still valid, then add another city somewhere in the pacific where it's -11, check the times, then change the time back to current AI!
+
     end
   end
 end
