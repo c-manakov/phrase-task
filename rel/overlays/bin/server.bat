@@ -1,2 +1,2 @@
 set PHX_SERVER=true
-call "%~dp0\jump_task" start
+call "%~dp0\phrase_task" start

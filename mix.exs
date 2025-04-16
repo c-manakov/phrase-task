@@ -9,7 +9,8 @@ defmodule PhraseTask.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      releases: releases()
     ]
   end
 
@@ -84,6 +85,19 @@ defmodule PhraseTask.MixProject do
         "tailwind phrase_task --minify",
         "esbuild phrase_task --minify",
         "phx.digest"
+      ]
+    ]
+  end
+
+  defp releases do
+    [
+      phrase_task: [
+        include_executables_for: [:unix],
+        applications: [runtime_tools: :permanent],
+        steps: [:assemble, :tar],
+        config_providers: [
+          {Config.Reader, file: "${RELEASE_ROOT}/config/runtime.exs"}
+        ]
       ]
     ]
   end

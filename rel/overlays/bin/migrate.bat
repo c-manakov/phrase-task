@@ -1,1 +1,1 @@
-call "%~dp0\jump_task" eval JumpTask.Release.migrate
+call "%~dp0\phrase_task" eval PhraseTask.Release.migrate
