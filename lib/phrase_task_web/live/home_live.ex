@@ -47,12 +47,6 @@ defmodule PhraseTaskWeb.HomeLive do
     end
   end
 
-  # remove this and instead just use push_event inside the select handler AI!
-  @impl true
-  def handle_info({:focus_element, id}, socket) do
-    {:noreply, push_event(socket, "focus", %{id: id})}
-  end
-
   @impl true
   def handle_event("update_time", %{"value" => value}, socket) do
     parse_time(value)
@@ -116,14 +110,12 @@ defmodule PhraseTaskWeb.HomeLive do
     index = String.to_integer(index)
     timezone = Enum.at(socket.assigns.new_city_search_results, index)
 
-    # Schedule focus after the DOM updates
-    Process.send_after(self(), {:focus_element, "city-name"}, 10)
-
     {:noreply,
      socket
      |> assign(:new_city_search_input, timezone.title)
      |> assign(:new_city, timezone)
      |> assign(:new_city_search_results, [])
+     |> push_event("focus", %{id: "city-name"})
      |> enable_add_button()}
   end
 
