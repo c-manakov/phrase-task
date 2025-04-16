@@ -140,8 +140,8 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       # Add the city
       html =
         view
-        |> element("button[type='submit']:not([disabled])")
-        |> render_click()
+        |> element("form[phx-submit='add_city']")
+        |> render_submit()
 
       # Check if city was added to the list
       assert html =~ "New York"
@@ -161,8 +161,8 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       |> render_click()
 
       view
-      |> element("button[type='submit']:not([disabled])")
-      |> render_click()
+      |> element("form[phx-submit='add_city']")
+      |> render_submit()
 
       # Verify city was added
       assert render(view) =~ "New York"
@@ -209,8 +209,8 @@ defmodule PhraseTaskWeb.HomeLiveTest do
 
       html =
         view
-        |> element("button[type='submit']:not([disabled])")
-        |> render_click()
+        |> element("form[phx-submit='add_city']")
+        |> render_submit()
 
       # Add London
       view
