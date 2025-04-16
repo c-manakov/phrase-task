@@ -12,14 +12,10 @@ const Hooks = {
   
   TimezoneHook: {
     mounted() {
-      // Get timezone information
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const offset = new Date().getTimezoneOffset();
       
-      // Send to the server
       this.pushEvent("set_timezone", { 
-        timezone: timezone,
-        offset: offset
+        timezone: timezone
       });
     }
   }
