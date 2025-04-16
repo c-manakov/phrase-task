@@ -48,8 +48,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       # Enter a specific time
       html =
         view
-# so selecting by phx-change doesn't work, we need to add ids and select using them  AI!
-        |> element("form[phx-change='update_time'] input[type='text']")
+        |> element("#time-input")
         |> render_change(%{value: "14:30"})
 
       # Check if time was updated
@@ -64,7 +63,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
 
       # First set a manual time
       view
-      |> element("form[phx-change='update_time'] input[type='text']")
+      |> element("#time-input")
       |> render_change(%{value: "14:30"})
 
       # Then switch back to current time
@@ -83,7 +82,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
 
       # Enter an invalid time
       view
-      |> element("form[phx-change='update_time'] input[type='text']")
+      |> element("#time-input")
       |> render_change(%{value: "invalid"})
 
       # Trigger validity check
@@ -196,7 +195,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
 
       # Set a specific time
       view
-      |> element("form[phx-change='update_time'] input[type='text']")
+      |> element("#time-input")
       |> render_change(%{value: "12:00"})
 
       # Add New York
