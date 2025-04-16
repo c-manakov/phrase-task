@@ -4,7 +4,7 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    current_time = Timex.now()
+    current_time = Timex.local()
 
     {:ok,
      socket
@@ -20,7 +20,7 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def handle_info(:update_time, socket) do
-    current_time = Timex.now()
+    current_time = Timex.local()
 
     socket =
       if socket.assigns.use_current_time do
@@ -59,7 +59,7 @@ defmodule PhraseTaskWeb.HomeLive do
          |> assign(:time_input, value)
          |> assign(:time_input_valid?, true)}
 
-      otherwise ->
+      _otherwise ->
         {:noreply,
          socket
          |> assign(:time_input, value)
@@ -69,7 +69,7 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def handle_event("use_current_time", _params, socket) do
-    current_time = DateTime.utc_now()
+    current_time = Timex.local()
 
     {:noreply,
      socket
@@ -78,19 +78,17 @@ defmodule PhraseTaskWeb.HomeLive do
   end
 
   @impl true
-  def handle_event("add_city", %{"city" => city}, socket) when byte_size(city) > 0 do
+  def handle_event("add_city", _, socket) do
     # In a real app, we would look up the timezone from a database
     # For this demo, we'll just assign a random timezone
-    timezones = ["America/New_York", "Europe/London", "Asia/Tokyo", "Australia/Sydney"]
-    timezone = Enum.random(timezones)
-
-    new_city = %{name: city, timezone: timezone}
+    new_city = socket.assigns.new_city
     updated_cities = socket.assigns.cities ++ [new_city]
 
     {:noreply,
      socket
      |> assign(:cities, updated_cities)
-     |> assign(:new_city, "")}
+     |> assign(:new_city_search_input, "")
+     |> assign(:new_city, nil)}
   end
 
   @impl true
@@ -106,10 +104,13 @@ defmodule PhraseTaskWeb.HomeLive do
   end
 
   @impl true
-  def handle_event("select_city", %{"timezone" => timezone}, socket) do
+  def handle_event("select_city", %{"index" => index}, socket) do
+    index = String.to_integer(index)
+    timezone = Enum.at(socket.assigns.new_city_search_results, index)
+
     {:noreply,
      socket
-     |> assign(:new_city_search_input, timezone.pretty_timezone_location)
+     |> assign(:new_city_search_input, timezone.title)
      |> assign(:new_city, timezone)
      |> assign(:new_city_search_results, [])}
   end
@@ -188,12 +189,14 @@ defmodule PhraseTaskWeb.HomeLive do
             <div class="divide-y divide-gray-200">
               <%= for {city, index} <- Enum.with_index(@cities) do %>
                 <div class="grid grid-cols-12 py-3 px-2 hover:bg-gray-50 transition duration-150 items-center">
-                  <div class="col-span-5 font-medium text-gray-900">{city.name}</div>
+                  <div class="col-span-5 font-medium text-gray-900">
+                    {city.pretty_timezone_location}
+                  </div>
                   <div class="col-span-3 font-mono text-gray-800">
-                    {convert_time(@time, city.timezone)}
+                    {convert_time(@time, city.timezone_id)}
                   </div>
                   <div class="col-span-3 text-sm text-gray-500">
-                    {get_timezone_abbreviation(city.timezone)}
+                    {city.timezone_abbr}
                   </div>
                   <div class="col-span-1 text-right">
                     <button
@@ -229,9 +232,9 @@ defmodule PhraseTaskWeb.HomeLive do
                 />
               </.form>
               <div
+                :if={@new_city_search_input != "" && @new_city == nil}
                 id="city-results"
-                class={"absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm"}
-                :if={!Enum.empty?(@new_city_search_results)}
+                class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm"
                 phx-click-away={JS.hide(to: "#city-results")}
               >
                 <div class="city-result-items">
@@ -240,14 +243,14 @@ defmodule PhraseTaskWeb.HomeLive do
                       No matching cities found
                     </div>
                   <% else %>
-                    <%= for timezone <- @new_city_search_results do %>
-                      <div 
+                    <%= for {timezone, index} <- Enum.with_index(@new_city_search_results) do %>
+                      <div
                         class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100"
                         phx-click="select_city"
-                        phx-value-timezone={timezone}
+                        phx-value-index={index}
                       >
                         <div class="flex items-center">
-                          <span class="font-normal block truncate"><%= timezone.pretty_timezone_location %></span>
+                          <span class="font-normal block truncate">{timezone.title}</span>
                         </div>
                       </div>
                     <% end %>
@@ -293,7 +296,6 @@ defmodule PhraseTaskWeb.HomeLive do
   end
 
   defp format_time(datetime) do
-    # Format time as HH:MM using Timex
     Timex.format!(datetime, "%H:%M", :strftime)
   end
 
@@ -303,7 +305,8 @@ defmodule PhraseTaskWeb.HomeLive do
       {:ok, time} ->
         today = Timex.today()
 
-        {:ok, Timex.set(time, date: today)}
+        local_timezone = Timex.Timezone.local()
+        {:ok, time |> Timex.set(date: today) |> Timex.to_datetime(local_timezone)}
 
       otherwise ->
         otherwise
@@ -311,16 +314,9 @@ defmodule PhraseTaskWeb.HomeLive do
   end
 
   defp convert_time(datetime, timezone) do
-    # Convert the datetime to the specified timezone using Timex
     datetime
     |> Timex.to_datetime()
     |> Timex.Timezone.convert(timezone)
     |> format_time()
-  end
-
-  defp get_timezone_abbreviation(timezone) do
-    # Get the timezone abbreviation using Timex
-    datetime = Timex.now(timezone)
-    Timex.format!(datetime, "%Z", :strftime)
   end
 end
