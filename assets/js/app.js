@@ -42,3 +42,11 @@ liveSocket.connect()
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket
 
+// Import hooks
+import Hooks from "./hooks";
+
+// Include hooks in LiveSocket initialization
+let liveSocket = new LiveSocket("/live", Socket, {
+  params: {_csrf_token: csrfToken},
+  hooks: Hooks
+});

@@ -48,6 +48,11 @@ defmodule PhraseTaskWeb.HomeLive do
   end
 
   @impl true
+  def handle_info({:focus_element, id}, socket) do
+    {:noreply, push_event(socket, "focus", %{id: id})}
+  end
+
+  @impl true
   def handle_event("update_time", %{"value" => value}, socket) do
     parse_time(value)
     |> case do
@@ -107,11 +112,11 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def handle_event("select_city", %{"index" => index}, socket) do
-    dbg()
     index = String.to_integer(index)
     timezone = Enum.at(socket.assigns.new_city_search_results, index)
 
-    dbg()
+    # Schedule focus after the DOM updates
+    Process.send_after(self(), {:focus_element, "city-name"}, 10)
 
     {:noreply,
      socket
@@ -136,7 +141,7 @@ defmodule PhraseTaskWeb.HomeLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div>
+    <div phx-hook="FocusHook">
       <h1 class="text-3xl font-bold text-gray-900 mb-10 text-center">
         Timezone Converter
       </h1>
@@ -257,11 +262,7 @@ defmodule PhraseTaskWeb.HomeLive do
                       <button
                         type="button"
                         class="w-full text-left cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100"
-                        phx-click={
-                            JS.push("select_city")  
-                            |> JS.push_focus(to: "#city-name")
-                            |> JS.pop_focus()
-                        }
+                        phx-click="select_city"
                         phx-value-index={index}
                       >
                         <div class="flex items-center">
