@@ -1,6 +1,6 @@
 defmodule PhraseTaskWeb.HomeLiveTest do
   use PhraseTaskWeb.ConnCase
-  use Patch
+  use Patch, except: [:render]
 
   import Phoenix.LiveViewTest
   alias PhraseTask.Timezones.Timezone
