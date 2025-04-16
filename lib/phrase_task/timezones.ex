@@ -1,5 +1,4 @@
 defmodule PhraseTask.Timezones do
-  # this works wonderfully, now I want to write some tests for it, create a test file that would test this function  AI!
   @moduledoc """
   The Timezones context.
   """
