@@ -48,6 +48,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       # Enter a specific time
       html =
         view
+# so selecting by phx-change doesn't work, we need to add ids and select using them  AI!
         |> element("form[phx-change='update_time'] input[type='text']")
         |> render_change(%{value: "14:30"})
 

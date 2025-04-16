@@ -137,7 +137,7 @@ defmodule PhraseTaskWeb.HomeLive do
       <div class="bg-white rounded-lg shadow p-6 mb-8">
         <h2 class="text-xl font-medium text-gray-800 mb-4">Enter time</h2>
 
-        <.form for={%{}} phx-change="update_time">
+        <.form for={%{}} phx-change="update_time" phx-submit="update_time">
           <input
             type="text"
             name="value"
