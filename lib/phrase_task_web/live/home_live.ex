@@ -194,10 +194,11 @@ defmodule PhraseTaskWeb.HomeLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div phx-hook="TimezoneHook" id="focus-hook">
-      <h1 class="text-3xl font-bold text-gray-900 mb-10 text-center">
-        Timezone Converter
-      </h1>
+    <div phx-hook="FocusHook" id="focus-hook">
+      <div phx-hook="TimezoneHook" id="timezone-hook">
+        <h1 class="text-3xl font-bold text-gray-900 mb-10 text-center">
+          Timezone Converter
+        </h1>
 
       <div class="bg-white rounded-lg shadow p-6 mb-8">
         <h2 class="text-xl font-medium text-gray-800 mb-4">Enter time</h2>
@@ -345,6 +346,7 @@ defmodule PhraseTaskWeb.HomeLive do
 
       <div class="text-center text-gray-500 text-sm">
         All times are updated live when using current time
+      </div>
       </div>
     </div>
     """
