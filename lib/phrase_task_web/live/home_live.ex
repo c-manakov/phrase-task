@@ -47,6 +47,7 @@ defmodule PhraseTaskWeb.HomeLive do
     end
   end
 
+  # remove this and instead just use push_event inside the select handler AI!
   @impl true
   def handle_info({:focus_element, id}, socket) do
     {:noreply, push_event(socket, "focus", %{id: id})}
