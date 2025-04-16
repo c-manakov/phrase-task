@@ -112,7 +112,12 @@ defmodule PhraseTaskWeb.HomeLive do
      socket
      |> assign(:new_city_search_input, timezone.title)
      |> assign(:new_city, timezone)
-     |> assign(:new_city_search_results, [])}
+     |> assign(:new_city_search_results, [])
+     |> enable_add_button()}
+  end
+
+  defp enable_add_button(socket) do
+    socket
   end
 
   @impl true
@@ -244,15 +249,16 @@ defmodule PhraseTaskWeb.HomeLive do
                     </div>
                   <% else %>
                     <%= for {timezone, index} <- Enum.with_index(@new_city_search_results) do %>
-                      <div
-                        class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100"
+                      <button
+                        type="button"
+                        class="w-full text-left cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100"
                         phx-click="select_city"
                         phx-value-index={index}
                       >
                         <div class="flex items-center">
                           <span class="font-normal block truncate">{timezone.title}</span>
                         </div>
-                      </div>
+                      </button>
                     <% end %>
                   <% end %>
                 </div>
@@ -263,7 +269,8 @@ defmodule PhraseTaskWeb.HomeLive do
               <input type="hidden" name="city" value={@new_city_search_input} />
               <button
                 type="submit"
-                class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-6 rounded-md transition duration-200"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-md transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={is_nil(@new_city)}
               >
                 ADD
               </button>
