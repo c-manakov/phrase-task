@@ -7,7 +7,6 @@ defmodule PhraseTaskWeb.HomeLiveTest do
 
   describe "HomeLive" do
     setup do
-      # Create test timezones
       timezones = [
         %{
           title: "America/New_York",
@@ -45,7 +44,6 @@ defmodule PhraseTaskWeb.HomeLiveTest do
     test "allows manual time input", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/")
 
-      # Enter a specific time
       html =
         view
         |> element("#time-form")
@@ -61,12 +59,9 @@ defmodule PhraseTaskWeb.HomeLiveTest do
     test "can switch back to current time", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/")
 
-      # First set a manual time
       view
       |> element("#time-form")
       |> render_change(%{value: "14:30"})
-
-      # Then switch back to current time
       html =
         view
         |> element("a[phx-click='use_current_time']")
@@ -80,12 +75,9 @@ defmodule PhraseTaskWeb.HomeLiveTest do
     test "shows error for invalid time input", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/")
 
-      # Enter an invalid time
       view
       |> element("#time-form")
       |> render_change(%{value: "invalid"})
-
-      # Trigger validity check
       send(view.pid, :check_if_valid)
 
       # Check if error message is displayed
@@ -95,13 +87,10 @@ defmodule PhraseTaskWeb.HomeLiveTest do
     test "searches for cities", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/")
 
-      # Search for New York
       html =
         view
         |> element("form[phx-change='update_new_city_search_input']")
         |> render_change(%{city_name: "New York"})
-
-      # Check if search results are displayed
       assert html =~ "America/New_York"
       assert view |> has_element?("#city-results")
     end
@@ -109,12 +98,9 @@ defmodule PhraseTaskWeb.HomeLiveTest do
     test "selects a city from search results", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/")
 
-      # Search for New York
       view
       |> element("form[phx-change='update_new_city_search_input']")
       |> render_change(%{city_name: "New York"})
-
-      # Select the city from search results
       html =
         view
         |> element("button[phx-click='select_city'][phx-value-index='0']")
@@ -127,17 +113,13 @@ defmodule PhraseTaskWeb.HomeLiveTest do
     test "adds a city to the list", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/")
 
-      # Search for New York
       view
       |> element("form[phx-change='update_new_city_search_input']")
       |> render_change(%{city_name: "New York"})
 
-      # Select the city from search results
       view
       |> element("button[phx-click='select_city'][phx-value-index='0']")
       |> render_click()
-
-      # Add the city
       html =
         view
         |> element("form[phx-submit='add_city']")
@@ -151,7 +133,6 @@ defmodule PhraseTaskWeb.HomeLiveTest do
     test "removes a city from the list", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/")
 
-      # Add a city
       view
       |> element("form[phx-change='update_new_city_search_input']")
       |> render_change(%{city_name: "New York"})
@@ -163,42 +144,32 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       view
       |> element("form[phx-submit='add_city']")
       |> render_submit()
-
-      # Verify city was added
       assert render(view) =~ "New York"
 
-      # Remove the city
       html =
         view
         |> element("button[phx-click='remove_city'][phx-value-index='0']")
         |> render_click()
-
-      # Check if city was removed
       assert html =~ "No cities added yet"
     end
 
     test "shows empty search results message", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/")
 
-      # Search for a non-existent city
       html =
         view
         |> element("form[phx-change='update_new_city_search_input']")
         |> render_change(%{city_name: "NonExistentCity"})
-
-      # Check if empty results message is displayed
       assert html =~ "No matching cities found"
     end
 
     test "converts time between timezones", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/")
 
-      # Set a specific time
       view
       |> element("#time-form")
       |> render_change(%{value: "12:00"})
 
-      # Add New York
       view
       |> element("form[phx-change='update_new_city_search_input']")
       |> render_change(%{city_name: "New York"})
@@ -211,7 +182,6 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       |> element("form[phx-submit='add_city']")
       |> render_submit()
 
-      # Add London
       view
       |> element("form[phx-change='update_new_city_search_input']")
       |> render_change(%{city_name: "London"})
@@ -224,8 +194,6 @@ defmodule PhraseTaskWeb.HomeLiveTest do
         view
         |> element("form[phx-submit='add_city']")
         |> render_submit()
-
-      # Check if both cities are displayed with different times
       assert html =~ "New York"
       assert html =~ "London"
 
