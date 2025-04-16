@@ -1,6 +1,5 @@
 defmodule PhraseTaskWeb.HomeLiveTest do
   use PhraseTaskWeb.ConnCase
-  use Patch
 
   import Phoenix.LiveViewTest
   alias PhraseTask.Timezones.Timezone
@@ -166,7 +165,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
 
     test "converts time between timezones", %{conn: conn} do
       # Mock Timex.Timezone.local to return a fixed timezone
-      patch(Timex.Timezone, :local, fn -> Timex.Timezone.get("UTC") end)
+      Patch.patch(Timex.Timezone, :local, fn -> Timex.Timezone.get("UTC") end)
       
       {:ok, view, _html} = live(conn, "/")
 
