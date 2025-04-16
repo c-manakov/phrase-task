@@ -1,5 +1,6 @@
 defmodule PhraseTaskWeb.HomeLiveTest do
   use PhraseTaskWeb.ConnCase
+  use Patch
 
   import Phoenix.LiveViewTest
   alias PhraseTask.Timezones.Timezone
@@ -164,12 +165,17 @@ defmodule PhraseTaskWeb.HomeLiveTest do
     end
 
     test "converts time between timezones", %{conn: conn} do
+      # Mock Timex.Timezone.local to return a fixed timezone
+      patch(Timex.Timezone, :local, fn -> Timex.Timezone.get("UTC") end)
+      
       {:ok, view, _html} = live(conn, "/")
 
+      # Set a specific time (12:00 UTC)
       view
       |> element("#time-form")
       |> render_change(%{value: "12:00"})
 
+      # Add New York (EST/EDT is UTC-5/UTC-4)
       view
       |> element("form[phx-change='update_new_city_search_input']")
       |> render_change(%{city_name: "New York"})
@@ -182,6 +188,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       |> element("form[phx-submit='add_city']")
       |> render_submit()
 
+      # Add London (GMT/BST is UTC+0/UTC+1)
       view
       |> element("form[phx-change='update_new_city_search_input']")
       |> render_change(%{city_name: "London"})
@@ -194,14 +201,28 @@ defmodule PhraseTaskWeb.HomeLiveTest do
         view
         |> element("form[phx-submit='add_city']")
         |> render_submit()
+        
+      # Verify cities are displayed
       assert html =~ "New York"
       assert html =~ "London"
 
-      # The times should be different due to timezone differences
-      # This is a bit tricky to test precisely since it depends on the local timezone
-      # But we can verify that the grid has multiple time entries
+      # Parse the HTML to check the time values
       {:ok, parsed} = Floki.parse_document(html)
-      assert Enum.count(Floki.find(parsed, ".col-span-3.font-mono")) >= 2
+      time_elements = Floki.find(parsed, ".col-span-3.font-mono")
+      
+      # We should have exactly 2 time elements (one for each city)
+      assert Enum.count(time_elements) == 2
+      
+      # Extract the time text from the elements
+      times = Enum.map(time_elements, fn element -> 
+        Floki.text(element) |> String.trim()
+      end)
+      
+      # New York time should be 5 hours behind UTC (07:00)
+      # London time should be the same as UTC (12:00)
+      # Note: This may vary based on daylight saving time
+      assert Enum.member?(times, "07:00") || Enum.member?(times, "08:00") # Depending on DST
+      assert Enum.member?(times, "12:00") || Enum.member?(times, "13:00") # Depending on DST
     end
   end
 end
