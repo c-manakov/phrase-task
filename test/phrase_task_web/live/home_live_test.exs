@@ -212,6 +212,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       # The times should be different due to timezone differences
       # This is a bit tricky to test precisely since it depends on the local timezone
       # But we can verify that the grid has multiple time entries
+# html_tree function doesn't exist, what was the exact intention here   AI?
       assert Enum.count(Floki.find(html_tree(html), ".col-span-3.font-mono")) >= 2
     end
   end
