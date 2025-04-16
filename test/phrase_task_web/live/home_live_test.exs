@@ -128,6 +128,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       {:ok, view, _html} = live(conn, "/")
 
       # Search for New York
+# again, apply the same changes here and to all other tests AI!
       view
       |> element("form[phx-change='update_new_city_search_input'] input#city-name")
       |> render_change(%{city_name: "New York"})
