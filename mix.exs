@@ -97,7 +97,7 @@ defmodule PhraseTask.MixProject do
         steps: [:assemble, :tar],
         overlays: ["rel/overlays"],
         config_providers: [
-          {Config.Reader, path: "config/runtime.exs"}
+          {Config.Reader, {:system, "RELEASE_ROOT", "/config/runtime.exs"}}
         ]
       ]
     ]
