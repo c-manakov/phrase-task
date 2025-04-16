@@ -5,6 +5,8 @@ defmodule PhraseTaskWeb.HomeLiveTest do
   alias PhraseTask.Timezones.Timezone
   alias PhraseTask.Repo
 
+  use Patch, except: [:patch]
+
   describe "HomeLive" do
     setup do
       timezones = [
@@ -217,6 +219,7 @@ defmodule PhraseTaskWeb.HomeLiveTest do
         Floki.text(element) |> String.trim()
       end)
       
+# instead of doing this thing here with dst we can just mock the current date as well AI!
       # New York time should be 5 hours behind UTC (07:00)
       # London time should be the same as UTC (12:00)
       # Note: This may vary based on daylight saving time
