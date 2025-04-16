@@ -280,15 +280,18 @@ defmodule PhraseTaskWeb.HomeLiveTest do
       assert Enum.member?(times, "20:00")
       assert Enum.member?(times, "07:00")
 
+      # Mock the current time before switching back
+      fixed_current_time = Timex.to_datetime({{2023, 1, 15}, {10, 30, 0}}, "UTC")
+      Patch.patch(Timex, :local, fn -> fixed_current_time end)
+      
       # Switch back to current time
       view
       |> element("a[phx-click='use_current_time']")
       |> render_click()
 
-      # Verify we're back to current time (the time should be in HH:MM format)
-# we can just mock the current time too  AI!
+      # Verify we're back to the mocked current time
       html = render(view)
-      assert html =~ ~r/\d{2}:\d{2}/
+      assert html =~ "10:30"
       refute html =~ "18:00"
 
     end
