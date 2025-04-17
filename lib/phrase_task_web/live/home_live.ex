@@ -209,7 +209,6 @@ defmodule PhraseTaskWeb.HomeLive do
     |> format_time()
   end
 
-  # let's show the button for use_current_time only when the time selected is not current AI!
   @impl true
   def render(assigns) do
     ~H"""
@@ -248,15 +247,17 @@ defmodule PhraseTaskWeb.HomeLive do
             Please enter a valid time in HH:MM format
           </div>
         <% end %>
-        <div>
-          <a
-            href="#"
-            phx-click="use_current_time"
-            class="text-blue-600 hover:text-blue-800 text-sm font-medium transition duration-200"
-          >
-            Use current time
-          </a>
-        </div>
+        <%= if not @use_current_time do %>
+          <div>
+            <a
+              href="#"
+              phx-click="use_current_time"
+              class="text-blue-600 hover:text-blue-800 text-sm font-medium transition duration-200"
+            >
+              Use current time
+            </a>
+          </div>
+        <% end %>
       </div>
 
       <div class="bg-white rounded-lg shadow p-6 mb-8">
