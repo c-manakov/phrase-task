@@ -35,3 +35,6 @@ phrase_task-*.tar
 npm-debug.log
 /assets/node_modules/
 
+.aider*
+
+.lexical/*

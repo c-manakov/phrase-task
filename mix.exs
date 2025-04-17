@@ -57,7 +57,12 @@ defmodule PhraseTask.MixProject do
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:timex, "~> 3.7"},
+      {:tz, "~> 0.28"},
+      {:tz_extra, "~> 0.45"},
+      {:live_debugger, "~> 0.1.4", only: :dev},
+      {:patch, "~> 0.15.0", only: [:test, :dev]}
     ]
   end
 
