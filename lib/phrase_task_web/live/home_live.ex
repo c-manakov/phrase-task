@@ -21,6 +21,7 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def handle_info(:update_time, socket) do
+    # this piece of code is repeated several times, let's create a function and remove unnesecarry comments AI!
     current_time = 
       if socket.assigns.client_timezone do
         # Get the current time in UTC first
