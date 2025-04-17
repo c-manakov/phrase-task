@@ -209,6 +209,7 @@ defmodule PhraseTaskWeb.HomeLive do
     |> format_time()
   end
 
+  # let's show the button for use_current_time only when the time selected is not current AI!
   @impl true
   def render(assigns) do
     ~H"""
