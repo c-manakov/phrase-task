@@ -19,18 +19,18 @@ defmodule PhraseTaskWeb.HomeLive do
      |> schedule_time_update()}
   end
 
+  defp get_current_time(client_timezone) do
+    if client_timezone do
+      now = Timex.now()
+      Timex.Timezone.convert(now, client_timezone)
+    else
+      Timex.local()
+    end
+  end
+
   @impl true
   def handle_info(:update_time, socket) do
-    # this piece of code is repeated several times, let's create a function and remove unnesecarry comments AI!
-    current_time = 
-      if socket.assigns.client_timezone do
-        # Get the current time in UTC first
-        now = Timex.now()
-        # Then convert it to the client's timezone
-        Timex.Timezone.convert(now, socket.assigns.client_timezone)
-      else
-        Timex.local()
-      end
+    current_time = get_current_time(socket.assigns.client_timezone)
 
     socket =
       if socket.assigns.use_current_time do
@@ -79,15 +79,7 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def handle_event("use_current_time", _params, socket) do
-    current_time = 
-      if socket.assigns.client_timezone do
-        # Get the current time in UTC first
-        now = Timex.now()
-        # Then convert it to the client's timezone
-        Timex.Timezone.convert(now, socket.assigns.client_timezone)
-      else
-        Timex.local()
-      end
+    current_time = get_current_time(socket.assigns.client_timezone)
 
     {:noreply,
      socket
@@ -146,15 +138,7 @@ defmodule PhraseTaskWeb.HomeLive do
 
   @impl true
   def handle_event("set_timezone", %{"timezone" => timezone}, socket) do
-    current_time = 
-      if timezone do
-        # Get the current time in UTC first
-        now = Timex.now()
-        # Then convert it to the client's timezone
-        Timex.Timezone.convert(now, timezone)
-      else
-        Timex.local()
-      end
+    current_time = get_current_time(timezone)
 
     {:noreply, 
      socket
